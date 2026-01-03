@@ -1,227 +1,484 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>القرآن الكريم كلمة في صورة</title>
     <style>
-        body{
-            background-image:url('https://scontent.fkwi4-3.fna.fbcdn.net/v/t39.30808-6/327299292_1169105060406833_6580842356442991442_n.png?stp=dst-png_s960x960&_nc_cat=105&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=BgzDVC59ph4Q7kNvgHSz8Kn&_nc_oc=AdlUaUICs3RWY8yS2DWbb4AOzSgzb8PM2q7Eg-YP-LzYzKXz-yYw696F8omY4jbIN3Y&_nc_zt=23&_nc_ht=scontent.fkwi4-3.fna&_nc_gid=nXhfFvmJa8wQ_K5DaZWLhw&oh=00_AYGZxLAZzHR4uOM_icLw8BE1vGF9a12kQcOIzOjjkzhe7g&oe=67E1C93E');
-            color:white;
-            margin-top:-0.5%;
-            height:100%;
-            width:100%;          
-            height: 100vh; /* Full viewport height */
-            background-size: cover; /* Makes it similar to how videos are resized */
-            position:relative; /* Needed for overlay positioning */
+        :root {
+            /* iOS 26 Design Tokens - Ultra Premium */
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --accent-color: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.4);
+            --transition-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+            --radius-bubble: 30px;
+            --radius-squircle: 45px;
+            --radius-island: 35px;
         }
 
-          
-          .content {
-              display: inline-block; /* Ensure content aligns horizontally */
-          }
-          /* Optional: Add overlay styling to simulate video effect */
-          .overlay {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            height: 100vh;
+            height: -webkit-fill-available;
+            overflow: hidden;
+            color: var(--text-main);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Fixed Background Image */
+        .custom-background {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image: url('https://png.pngtree.com/thumb_back/fw800/background/20231029/pngtree-blurred-bokeh-backdrop-unfocused-abstract-art-gallery-or-art-center-texture-image_13737569.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .background-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* Centered Main Shell */
+        .glass-shell {
+            width: 88vw;
+            max-width: 1300px;
+            height: 82vh;
+            background: rgba(15, 15, 25, 0.2);
+            backdrop-filter: blur(60px) saturate(220%);
+            -webkit-backdrop-filter: blur(60px) saturate(220%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-squircle);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 60px 120px rgba(0, 0, 0, 0.6), 
+                        inset 0 0 2px rgba(255,255,255,0.1);
+            transition: all 0.7s var(--transition-fluid);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .glass-shell.is-immersive {
+            width: 100vw !important;
+            max-width: none !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            border: none !important;
+            background: rgba(0, 0, 0, 0.98) !important;
+        }
+
+        /* Header Bubbles */
+        .header {
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .header > * { pointer-events: auto; }
+
+        .bubble {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 28px;
+            border-radius: var(--radius-bubble);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+            transition: all 0.4s var(--transition-fluid);
+        }
+
+        .bubble:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .title-bubble h1 {
+            font-weight: 800;
+            font-size: clamp(1rem, 2.8vw, 1.4rem);
+            background: linear-gradient(180deg, #ffffff 0%, #d1d1d1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            letter-spacing: -0.8px;
+        }
+
+        .home-btn {
+            display: none;
+            background: var(--accent-color);
+            border: none;
+            color: #000;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .is-immersive .home-btn { display: flex; align-items: center; gap: 8px; }
+
+        .action-bubble { padding: 8px 12px 8px 24px; gap: 18px; }
+
+        .fs-toggle {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 18px;
+            transition: background 0.2s;
+        }
+
+        .fs-toggle:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .counter-pill {
+            color: var(--accent-color);
+            font-weight: 900;
+            font-size: 1.1rem;
+            min-width: 90px;
+            text-align: center;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Content Area */
+        .viewport {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        .slide {
             position: absolute;
-            margin-top: 0;
-            margin-left: 0;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: all 0.8s var(--transition-fluid);
+            transform: scale(0.92) translateY(30px);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .image-container {
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay for a cinematic effect */
-            z-index: 1; /* Ensures it stays above the background */
-          }
-          
-          /* Content styling on top of the image */
-          .content {
-            position: relative;
-            z-index: 2;
-            color: white;
-            font-size: 24px;
-            text-align: center;
-            margin-top: 20%;
-          }
-        body{
-            color:white;
-            margin: 0;
-            overflow-y: scroll;
-            padding: 0;
-            background:rgb(31,31,31);
-            font-family: segoe ui;
-        }  ::-webkit-scrollbar {
-            width: 1px; /* Width of the scrollbar */
-            background:rgb(31,31,31);
-          }
-          
-          ::-webkit-scrollbar-track {
-            background:rgb(31,31,31); /* No background for the track */
-            width:1px;
-          }
-          nav{
-            background:black;
-            color:white;
-            margin-top:0%;
-            height:3.6%;
-            width:100%;
-            position:fixed;
-          }
-          nav button{
-            width:50%;
-            font-size:100%;
-            background:rgb(165, 0, 18);
-            color:white;
-            font-family:segoe ui;
-            border-style:none;
-            cursor:pointer;
-          }
-          nav button:hover{
-            background:rgb(191, 38, 56);
-          }
-          ::-webkit-scrollbar-thumb {
-            background:rgb(31,31,31); /* Color of the scrollbar thumb */
-            border-radius: 10px; /* Rounded edges */
-            border: 0px solid transparent; /* Space between thumb and scrollbar track */
-            background-clip: padding-box;
-          }
-          
-          /* For Firefox */
-          html {
-            scrollbar-width: 1px; /* Thin scrollbar */
-            scrollbar-color:rgb(31,31,31);
-            scrollbar-track-color: rgb(191, 38, 56);
-          }
-          button{
-            width:100%;
-            font-size:100%;
-            background:rgb(165, 0, 18);
-            color:white;
-            font-family:'Times New Roman';
-            border-style:none;
-            cursor:pointer;
-          }
-          button:hover{
-            background:rgb(191, 38, 56);
-          }
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
+        .slide img {
+            max-width: 95%;
+            max-height: 95%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: var(--radius-island);
+            box-shadow: 0 50px 110px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
 
+        /* Navigation Arrows */
+        .controls {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 25px;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        .nav-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.4s var(--transition-fluid);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .nav-icon {
+            width: 32px;
+            height: 32px;
+            stroke: currentColor;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .icon-forward { transform: scaleX(-1); }
+
+        .nav-btn:hover {
+            background: var(--accent-color);
+            color: #000;
+            transform: scale(1.15);
+            box-shadow: 0 0 45px var(--accent-glow);
+            border-color: transparent;
+        }
+
+        /* Thumbnails */
+        .thumb-nav {
+            height: 130px;
+            display: flex;
+            gap: 18px;
+            padding: 20px 50px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        .thumb-nav::-webkit-scrollbar { display: none; }
+
+        .thumbnail {
+            flex: 0 0 120px;
+            height: 100%;
+            border-radius: 18px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            opacity: 0.35;
+            object-fit: cover;
+            transition: all 0.4s var(--transition-fluid);
+        }
+
+        .thumbnail.active {
+            opacity: 1;
+            border-color: var(--accent-color);
+            transform: scale(1.08) translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+        }
+
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.04);
+            z-index: 30;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #00d2ff, #7000ff);
+            width: 0%;
+            transition: width 0.7s var(--transition-fluid);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .is-immersive .thumb-nav, 
+        .is-immersive .progress-container,
+        .is-immersive .controls {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .controls { display: none; }
+            .header { padding: 20px; flex-direction: column; gap: 15px; }
+            .bubble { width: 92%; justify-content: center; }
+            .glass-shell { width: 95vw; height: 92vh; }
+            .viewport { padding: 10px; }
+        }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>30 - Parts - QKWIP</title>
+</head>
+<body>
 
-<body><center><a href="#END"><button>الذهاب إلى الأسفل</button></a>
-    <center><nav><a href="#"><button><</button></a><a href="#END"><button>></button></a><br>
- </nav></center>
+    <div class="custom-background"></div>
+    <div class="background-overlay"></div>
 
-<img id="carousel-image" src="../30/30/1.png" alt="">
-<img id="carousel-image" src="../30/30/2.png" alt="">
-<img id="carousel-image" src="../30/30/3.png" alt="">
-<img id="carousel-image" src="../30/30/4.png" alt="">
-<img id="carousel-image" src="../30/30/5.png" alt="">
-<img id="carousel-image" src="../30/30/6.png" alt="">
-<img id="carousel-image" src="../30/30/7.png" alt="">
-<img id="carousel-image" src="../30/30/8.png" alt="">
-<img id="carousel-image" src="../30/30/9.png" alt="">
-<img id="carousel-image" src="../30/30/10.png" alt="">
-<img id="carousel-image" src="../30/30/11.png" alt="">
-<img id="carousel-image" src="../30/30/12.png" alt="">
-<img id="carousel-image" src="../30/30/13.png" alt="">
-<img id="carousel-image" src="../30/30/14.png" alt="">
-<img id="carousel-image" src="../30/30/15.png" alt="">
-<img id="carousel-image" src="../30/30/16.png" alt="">
-<img id="carousel-image" src="../30/30/17.png" alt="">
-<img id="carousel-image" src="../30/30/18.png" alt="">
-<img id="carousel-image" src="../30/30/19.png" alt="">
-<img id="carousel-image" src="../30/30/20.png" alt="">
-<img id="carousel-image" src="../30/30/21.png" alt="">
-<img id="carousel-image" src="../30/30/22.png" alt="">
-<img id="carousel-image" src="../30/30/23.png" alt="">
-<img id="carousel-image" src="../30/30/24.png" alt="">
-<img id="carousel-image" src="../30/30/25.png" alt="">
-<img id="carousel-image" src="../30/30/26.png" alt="">
-<img id="carousel-image" src="../30/30/27.png" alt="">
-<img id="carousel-image" src="../30/30/28.png" alt="">
-<img id="carousel-image" src="../30/30/29.png" alt="">
-<img id="carousel-image" src="../30/30/30.png" alt="">
-<img id="carousel-image" src="../30/30/31.png" alt="">
-<img id="carousel-image" src="../30/30/32.png" alt="">
-<img id="carousel-image" src="../30/30/33.png" alt="">
-<img id="carousel-image" src="../30/30/34.png" alt="">
-<img id="carousel-image" src="../30/30/35.png" alt="">
-<img id="carousel-image" src="../30/30/36.png" alt="">
-<img id="carousel-image" src="../30/30/37.png" alt="">
-<img id="carousel-image" src="../30/30/38.png" alt="">
-<img id="carousel-image" src="../30/30/39.png" alt="">
-<img id="carousel-image" src="../30/30/40.png" alt="">
-<img id="carousel-image" src="../30/30/41.png" alt="">
-<img id="carousel-image" src="../30/30/42.png" alt="">
-<img id="carousel-image" src="../30/30/43.png" alt="">
-<img id="carousel-image" src="../30/30/45.png" alt="">
-<img id="carousel-image" src="../30/30/46.png" alt="">
-<img id="carousel-image" src="../30/30/47.png" alt="">
-<img id="carousel-image" src="../30/30/48.png" alt="">
-<img id="carousel-image" src="../30/30/49.png" alt="">
-<img id="carousel-image" src="../30/30/50.png" alt="">
-<img id="carousel-image" src="../30/30/51.png" alt="">
-<img id="carousel-image" src="../30/30/52.png" alt="">
-<img id="carousel-image" src="../30/30/53.png" alt="">
-<img id="carousel-image" src="../30/30/54.png" alt="">
-<img id="carousel-image" src="../30/30/55.png" alt="">
-<img id="carousel-image" src="../30/30/56.png" alt="">
-<img id="carousel-image" src="../30/30/57.png" alt="">
-<img id="carousel-image" src="../30/30/58.png" alt="">
-<img id="carousel-image" src="../30/30/59.png" alt="">
-<img id="carousel-image" src="../30/30/60.png" alt="">
-<img id="carousel-image" src="../30/30/61.png" alt="">
-<img id="carousel-image" src="../30/30/62.png" alt="">
-<img id="carousel-image" src="../30/30/63.png" alt="">
-<img id="carousel-image" src="../30/30/64.png" alt="">
-<img id="carousel-image" src="../30/30/65.png" alt="">
-<img id="carousel-image" src="../30/30/66.png" alt="">
-<img id="carousel-image" src="../30/30/67.png" alt="">
-<img id="carousel-image" src="../30/30/68.png" alt="">
-<img id="carousel-image" src="../30/30/69.png" alt="">
-<img id="carousel-image" src="../30/30/70.png" alt="">
-<img id="carousel-image" src="../30/30/71.png" alt="">
-<img id="carousel-image" src="../30/30/72.png" alt="">
-<img id="carousel-image" src="../30/30/73.png" alt="">
-<img id="carousel-image" src="../30/30/75.png" alt="">
-<img id="carousel-image" src="../30/30/76.png" alt="">
-<img id="carousel-image" src="../30/30/77.png" alt="">
-<img id="carousel-image" src="../30/30/78.png" alt="">
-<img id="carousel-image" src="../30/30/79.png" alt="">
-<img id="carousel-image" src="../30/30/80.png" alt="">
-<img id="carousel-image" src="../30/30/81.png" alt="">
-<img id="carousel-image" src="../30/30/82.png" alt="">
-<img id="carousel-image" src="../30/30/83.png" alt="">
-<img id="carousel-image" src="../30/30/84.png" alt="">
-<img id="carousel-image" src="../30/30/85.png" alt="">
-<img id="carousel-image" src="../30/30/86.png" alt="">
-<img id="carousel-image" src="../30/30/87.png" alt="">
-<img id="carousel-image" src="../30/30/88.png" alt="">
-<img id="carousel-image" src="../30/30/89.png" alt="">
-<img id="carousel-image" src="../30/30/90.png" alt="">
-<img id="carousel-image" src="../30/30/91.png" alt="">
-<img id="carousel-image" src="../30/30/92.png" alt="">
-<img id="carousel-image" src="../30/30/93.png" alt="">
-<img id="carousel-image" src="../30/30/94.png" alt="">
-<img id="carousel-image" src="../30/30/95.png" alt="">
-<img id="carousel-image" src="../30/30/96.png" alt="">
-<img id="carousel-image" src="../30/30/97.png" alt="">
-<img id="carousel-image" src="../30/30/98.png" alt="">
-<img id="carousel-image" src="../30/30/99.png" alt="">
-<img id="carousel-image" src="../30/30/100.png" alt="">
-<img id="carousel-image" src="../30/30/101.png" alt="">
-<img id="carousel-image" src="../30/30/102.png" alt="">
-<img id="carousel-image" src="../30/30/103.png" alt="">
-<img id="carousel-image" src="../30/30/104.png" alt="">
-<img id="carousel-image" src="../30/30/105.png" alt="">
-<img id="carousel-image" src="../30/30/106.png" alt="">
-<img id="carousel-image" src="../30/30/107.png" alt="">
-<img id="carousel-image" src="../30/30/108.png" alt="">
-<img id="carousel-image" src="../30/30/109.png" alt="">
-<img id="carousel-image" src="../30/30/110.png" alt="">
-<img id="carousel-image" src="../30/30/111.png" alt="">
-<img id="carousel-image" src="../30/30/112.png" alt="">
-<img id="carousel-image" src="../30/30/113.png" alt="">
-<img id="carousel-image" src="../30/30/114.png" alt="">
-<img id="carousel-image" src="../30/30/115.png" alt="">
-<img id="carousel-image" src="../30/30/116.png" alt=""><div id="END"></div>
-<a href="#"><button>الرجوع إلى الأعلى</button></a>
-</center></body></html>
+    <div class="glass-shell" id="main-app">
+        <div class="header">
+            <div class="bubble title-bubble">
+                <button class="home-btn" onclick="toggleImmersive()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span>الرئيسية</span>
+                </button>
+                <h1>القرآن الكريم كلمة في صورة</h1>
+            </div>
+
+            <div class="bubble action-bubble">
+                <button class="fs-toggle" onclick="toggleImmersive()" id="fs-btn">ملء الشاشة</button>
+                <div style="width: 1px; height: 20px; background: var(--glass-border);"></div>
+                <div class="counter-pill" id="counter">٠٠١ / ١١٦</div>
+            </div>
+        </div>
+
+        <div class="viewport" id="viewport">
+            <div class="controls">
+                <button class="nav-btn" onclick="changeSlide(1)" title="التالي">
+                    <svg class="nav-icon icon-forward" viewBox="0 0 24 24">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <button class="nav-btn" onclick="changeSlide(-1)" title="السابق">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+        </div>
+
+        <div class="thumb-nav" id="thumb-nav"></div>
+    </div>
+
+    <script>
+        // Massive Collection - 116 Images
+        const imageSources = [
+            "https://thumbs2.imgbox.com/81/0d/TIHehk9i_t.png", "https://thumbs2.imgbox.com/92/12/tRGp7ybt_t.png", "https://thumbs2.imgbox.com/ab/86/2kXyu2ld_t.png", "https://thumbs2.imgbox.com/11/14/vSeJcXgn_t.png", "https://thumbs2.imgbox.com/f8/de/tJV4ecRh_t.png", "https://thumbs2.imgbox.com/6a/a1/cLRhE5q9_t.png", "https://thumbs2.imgbox.com/92/bc/pPVcDfBi_t.png", "https://thumbs2.imgbox.com/84/95/4GY44slZ_t.png", "https://thumbs2.imgbox.com/72/9f/WyF7CUlJ_t.png", "https://thumbs2.imgbox.com/3c/2f/rhQ9PeLZ_t.png", "https://thumbs2.imgbox.com/eb/6c/i7plQsN2_t.png", "https://thumbs2.imgbox.com/c2/67/PJ82Nuiy_t.png", "https://thumbs2.imgbox.com/a5/d4/v6fmkSsT_t.png", "https://thumbs2.imgbox.com/e2/ea/MdA5IxZK_t.png", "https://thumbs2.imgbox.com/b7/5c/CBcdZsjS_t.png", "https://thumbs2.imgbox.com/01/11/XJwWCkGf_t.png", "https://thumbs2.imgbox.com/8b/cb/4AkbTvhV_t.png", "https://thumbs2.imgbox.com/3e/0d/Ax2DOJ40_t.png", "https://thumbs2.imgbox.com/b5/55/QWc0tsl2_t.png", "https://thumbs2.imgbox.com/2b/f0/00BEewAk_t.png", "https://thumbs2.imgbox.com/00/44/9iqQpumD_t.png", "https://thumbs2.imgbox.com/08/f1/mMiGS74P_t.png", "https://thumbs2.imgbox.com/0d/e9/0GK71HF7_t.png", "https://thumbs2.imgbox.com/e7/42/9oDHlXSr_t.png", "https://thumbs2.imgbox.com/10/83/I4BGSV4O_t.png", "https://thumbs2.imgbox.com/c9/a1/1wjvY9q6_t.png", "https://thumbs2.imgbox.com/05/f8/0k8tzlQ3_t.png", "https://thumbs2.imgbox.com/53/3b/peN1gOWC_t.png", "https://thumbs2.imgbox.com/65/bb/4LqSq22t_t.png", "https://thumbs2.imgbox.com/df/87/8Iv0MOWU_t.png", "https://thumbs2.imgbox.com/5d/9e/u51NWJFj_t.png", "https://thumbs2.imgbox.com/c3/6c/P8hIZVwP_t.png", "https://thumbs2.imgbox.com/64/55/gCksB70w_t.png", "https://thumbs2.imgbox.com/f0/57/2cwPWDRI_t.png", "https://thumbs2.imgbox.com/6c/cf/UZxFaveS_t.png", "https://thumbs2.imgbox.com/1a/5e/mruljM9I_t.png", "https://thumbs2.imgbox.com/56/d5/yYonlDfa_t.png", "https://thumbs2.imgbox.com/7d/a4/HeMmlHUX_t.png", "https://thumbs2.imgbox.com/6a/55/4YJ1r9ox_t.png", "https://thumbs2.imgbox.com/43/8c/g0flrd42_t.png", "https://thumbs2.imgbox.com/1b/33/c41IvObB_t.png", "https://thumbs2.imgbox.com/57/b9/ZgF6yqtX_t.png", "https://thumbs2.imgbox.com/7f/34/XyT5lOCe_t.png", "https://thumbs2.imgbox.com/f4/eb/u1IgA7iy_t.png", "https://thumbs2.imgbox.com/ca/e9/cgMS1qxM_t.png", "https://thumbs2.imgbox.com/ec/4f/b0JpZ8QP_t.png", "https://thumbs2.imgbox.com/5d/b1/0FavtS0W_t.png", "https://thumbs2.imgbox.com/82/2b/rFBmnfk8_t.png", "https://thumbs2.imgbox.com/a6/f7/Fei3yuKm_t.png", "https://thumbs2.imgbox.com/01/95/aO1VdFyO_t.png", "https://thumbs2.imgbox.com/0c/cd/jRwJQTdn_t.png", "https://thumbs2.imgbox.com/fa/24/D9a6cg44_t.png", "https://thumbs2.imgbox.com/5f/ef/vpLhpC3d_t.png", "https://thumbs2.imgbox.com/dc/8b/KG6TuHBZ_t.png", "https://thumbs2.imgbox.com/38/fc/wm7iCC6F_t.png", "https://thumbs2.imgbox.com/81/05/eCx3ttjr_t.png", "https://thumbs2.imgbox.com/65/04/Xr9L2eop_t.png", "https://thumbs2.imgbox.com/98/a1/7QMnbgcO_t.png", "https://thumbs2.imgbox.com/37/52/6N9GMfLM_t.png", "https://thumbs2.imgbox.com/34/31/D8XoHjdq_t.png", "https://thumbs2.imgbox.com/54/7e/B6rrlcOO_t.png", "https://thumbs2.imgbox.com/a5/3f/Yc0EOcn6_t.png", "https://thumbs2.imgbox.com/7a/61/YqUW5UQh_t.png", "https://thumbs2.imgbox.com/f3/9f/AeKJXmlF_t.png", "https://thumbs2.imgbox.com/af/d8/vmXTwKAc_t.png", "https://thumbs2.imgbox.com/02/e1/fXimJs8C_t.png", "https://thumbs2.imgbox.com/8d/0a/v0JAqidH_t.png", "https://thumbs2.imgbox.com/60/af/weS3pniT_t.png", "https://thumbs2.imgbox.com/9c/e9/ChruXWVS_t.png", "https://thumbs2.imgbox.com/44/3f/EkPqHDEk_t.png", "https://thumbs2.imgbox.com/49/d6/liI0ezJy_t.png", "https://thumbs2.imgbox.com/07/cd/LN51SLBo_t.png", "https://thumbs2.imgbox.com/f2/da/7GvchKzc_t.png", "https://thumbs2.imgbox.com/f5/56/PG0GEUOo_t.png", "https://thumbs2.imgbox.com/f6/27/GoiPtS3e_t.png", "https://thumbs2.imgbox.com/70/ae/OGiWXhSz_t.png", "https://thumbs2.imgbox.com/7a/79/aWDeFLls_t.png", "https://thumbs2.imgbox.com/57/eb/JnyIpAfE_t.png", "https://thumbs2.imgbox.com/f2/3a/rCHbMrfE_t.png", "https://thumbs2.imgbox.com/bf/a0/374BkT53_t.png", "https://thumbs2.imgbox.com/30/ab/O951UoL7_t.png", "https://thumbs2.imgbox.com/50/75/XREjKY78_t.png", "https://thumbs2.imgbox.com/a4/bd/Tt9wXyiS_t.png", "https://thumbs2.imgbox.com/f2/67/oMIcuIRB_t.png", "https://thumbs2.imgbox.com/e8/84/C2aD1dGp_t.png", "https://thumbs2.imgbox.com/50/f5/Du9muPo1_t.png", "https://thumbs2.imgbox.com/19/ce/L2QtfnVR_t.png", "https://thumbs2.imgbox.com/72/a1/BImCY1hc_t.png", "https://thumbs2.imgbox.com/cc/60/TkJJyETK_t.png", "https://thumbs2.imgbox.com/dc/8a/GErXz5Ud_t.png", "https://thumbs2.imgbox.com/ae/cd/I9qyrZb7_t.png", "https://thumbs2.imgbox.com/b7/05/g9eNY2Xs_t.png", "https://thumbs2.imgbox.com/8b/02/LdTaXsyI_t.png", "https://thumbs2.imgbox.com/63/c1/rEfzLHvU_t.png", "https://thumbs2.imgbox.com/65/82/gX5nfnDW_t.png", "https://thumbs2.imgbox.com/d3/ed/biyCdSWo_t.png", "https://thumbs2.imgbox.com/0c/bc/RhstHt7f_t.png", "https://thumbs2.imgbox.com/d0/5c/bfp6mHDa_t.png", "https://thumbs2.imgbox.com/7a/a8/o7gKt0BN_t.png", "https://thumbs2.imgbox.com/ef/4b/3i4oXpHL_t.png", "https://thumbs2.imgbox.com/ae/0e/PqDZ5DDV_t.png", "https://thumbs2.imgbox.com/0b/c6/ig1dqXa9_t.png", "https://thumbs2.imgbox.com/66/51/DO7Gs0B3_t.png", "https://thumbs2.imgbox.com/56/62/YA4DeHzW_t.png", "https://thumbs2.imgbox.com/3a/f9/raC14ao2_t.png", "https://thumbs2.imgbox.com/d3/29/EkCh8rvj_t.png", "https://thumbs2.imgbox.com/00/d4/9DugHcuy_t.png", "https://thumbs2.imgbox.com/a3/cd/8oT59XyC_t.png", "https://thumbs2.imgbox.com/29/82/RUPKYbeM_t.png", "https://thumbs2.imgbox.com/2a/b6/2kRML7zx_t.png", "https://thumbs2.imgbox.com/54/e0/7yiRutZ5_t.png", "https://thumbs2.imgbox.com/35/80/LGj6sXgN_t.png", "https://thumbs2.imgbox.com/42/be/f5VM2gw3_t.png", "https://thumbs2.imgbox.com/3a/78/oJib4MMP_t.png", "https://thumbs2.imgbox.com/ce/e1/dYfK6XLT_t.png", "https://thumbs2.imgbox.com/52/83/8HqFxxju_t.png"
+        ];
+        
+        let currentIndex = 0;
+        let isImmersive = false;
+        let touchStartX = 0;
+
+        const viewport = document.getElementById('viewport');
+        const thumbNav = document.getElementById('thumb-nav');
+        const progressBar = document.getElementById('progress');
+        const mainApp = document.getElementById('main-app');
+        const fsBtn = document.getElementById('fs-btn');
+
+        function toArabicDigits(num) {
+            const id = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return num.toString().replace(/[0-9]/g, w => id[+w]);
+        }
+
+        function init() {
+            // Clear existing elements
+            viewport.querySelectorAll('.slide').forEach(el => el.remove());
+            thumbNav.innerHTML = '';
+
+            imageSources.forEach((src, index) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${index === currentIndex ? 'active' : ''}`;
+                const container = document.createElement('div');
+                container.className = 'image-container';
+                const img = document.createElement('img');
+                img.src = src;
+                img.loading = index < 3 ? "eager" : "lazy";
+                img.draggable = false;
+                container.appendChild(img);
+                slide.appendChild(container);
+                viewport.appendChild(slide);
+
+                const thumb = document.createElement('img');
+                thumb.src = src;
+                thumb.className = `thumbnail ${index === currentIndex ? 'active' : ''}`;
+                thumb.onclick = () => goToSlide(index);
+                thumbNav.appendChild(thumb);
+            });
+            updateUI();
+            setupInteractions();
+        }
+
+        function changeSlide(dir) {
+            let next = (currentIndex + dir + imageSources.length) % imageSources.length;
+            goToSlide(next);
+        }
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const thumbs = document.querySelectorAll('.thumbnail');
+            if (!slides[currentIndex] || !thumbs[currentIndex]) return;
+            
+            slides[currentIndex].classList.remove('active');
+            thumbs[currentIndex].classList.remove('active');
+            
+            currentIndex = index;
+            
+            slides[currentIndex].classList.add('active');
+            thumbs[currentIndex].classList.add('active');
+            thumbs[currentIndex].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            updateUI();
+        }
+
+        function updateUI() {
+            const cur = toArabicDigits(String(currentIndex + 1).padStart(3, '0'));
+            const tot = toArabicDigits(String(imageSources.length).padStart(3, '0'));
+            document.getElementById('counter').innerText = `${cur} / ${tot}`;
+            progressBar.style.width = ((currentIndex + 1) / imageSources.length) * 100 + '%';
+        }
+
+        function setupInteractions() {
+            viewport.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, {passive: true});
+            viewport.addEventListener('touchend', e => {
+                const endX = e.changedTouches[0].screenX;
+                if (endX < touchStartX - 50) changeSlide(1);
+                if (endX > touchStartX + 50) changeSlide(-1);
+            }, {passive: true});
+        }
+
+        function toggleImmersive() {
+            isImmersive = !isImmersive;
+            mainApp.classList.toggle('is-immersive', isImmersive);
+            fsBtn.innerText = isImmersive ? "تصغير" : "ملء الشاشة";
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === "ArrowRight") changeSlide(-1);
+            if (e.key === "ArrowLeft") changeSlide(1);
+            if (e.key.toLowerCase() === "f") toggleImmersive();
+            if (e.key === "Escape" && isImmersive) toggleImmersive();
+        });
+
+        init();
+    </script>
+</body>
+</html>
