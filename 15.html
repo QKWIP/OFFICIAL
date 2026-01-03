@@ -1,175 +1,442 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>القرآن الكريم كلمة في صورة</title>
     <style>
-        body{
-            background-image:url('https://scontent.fkwi4-3.fna.fbcdn.net/v/t39.30808-6/327299292_1169105060406833_6580842356442991442_n.png?stp=dst-png_s960x960&_nc_cat=105&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=BgzDVC59ph4Q7kNvgHSz8Kn&_nc_oc=AdlUaUICs3RWY8yS2DWbb4AOzSgzb8PM2q7Eg-YP-LzYzKXz-yYw696F8omY4jbIN3Y&_nc_zt=23&_nc_ht=scontent.fkwi4-3.fna&_nc_gid=nXhfFvmJa8wQ_K5DaZWLhw&oh=00_AYGZxLAZzHR4uOM_icLw8BE1vGF9a12kQcOIzOjjkzhe7g&oe=67E1C93E');
-            color:white;
-            margin-top:-0.5%;
-            height:100%;
-            width:100%;          
-            height: 100vh; /* Full viewport height */
-            background-size: cover; /* Makes it similar to how videos are resized */
-            position:relative; /* Needed for overlay positioning */
+        :root {
+            /* Design Tokens */
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --accent-color: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.4);
+            --transition-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+            --radius-bubble: 30px;
+            --radius-squircle: 45px;
+            --radius-island: 35px;
         }
 
-          
-          .content {
-              display: inline-block; /* Ensure content aligns horizontally */
-          }
-          /* Optional: Add overlay styling to simulate video effect */
-          .overlay {
-            position: absolute;
-            margin-top: 0;
-            margin-left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay for a cinematic effect */
-            z-index: 1; /* Ensures it stays above the background */
-          }
-          
-          /* Content styling on top of the image */
-          .content {
-            position: relative;
-            z-index: 2;
-            color: white;
-            font-size: 24px;
-            text-align: center;
-            margin-top: 20%;
-          }
-        body{
-            color:white;
+        * {
             margin: 0;
-            overflow-y: scroll;
             padding: 0;
-            background:rgb(31,31,31);
-            font-family: segoe ui;
-        }  ::-webkit-scrollbar {
-            width: 1px; /* Width of the scrollbar */
-            background:rgb(31,31,31);
-          }
-          
-          ::-webkit-scrollbar-track {
-            background:rgb(31,31,31); /* No background for the track */
-            width:1px;
-          }
-          nav{
-            background:black;
-            color:white;
-            margin-top:0%;
-            height:3.6%;
-            width:100%;
-            position:fixed;
-          }
-          nav button{
-            width:50%;
-            font-size:100%;
-            background:rgb(165, 0, 18);
-            color:white;
-            font-family:segoe ui;
-            border-style:none;
-            cursor:pointer;
-          }
-          nav button:hover{
-            background:rgb(191, 38, 56);
-          }
-          ::-webkit-scrollbar-thumb {
-            background:rgb(31,31,31); /* Color of the scrollbar thumb */
-            border-radius: 10px; /* Rounded edges */
-            border: 0px solid transparent; /* Space between thumb and scrollbar track */
-            background-clip: padding-box;
-          }
-          
-          /* For Firefox */
-          html {
-            scrollbar-width: 1px; /* Thin scrollbar */
-            scrollbar-color:rgb(31,31,31);
-            scrollbar-track-color: rgb(191, 38, 56);
-          }
-          button{
-            width:100%;
-            font-size:100%;
-            background:rgb(165, 0, 18);
-            color:white;
-            font-family:'Times New Roman';
-            border-style:none;
-            cursor:pointer;
-          }
-          button:hover{
-            background:rgb(191, 38, 56);
-          }
+            box-sizing: border-box;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
+        body {
+            height: 100vh;
+            height: -webkit-fill-available;
+            overflow: hidden;
+            background: #050505;
+            color: var(--text-main);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
+        .custom-background {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image: url('https://png.pngtree.com/thumb_back/fw800/background/20231029/pngtree-blurred-bokeh-backdrop-unfocused-abstract-art-gallery-or-art-center-texture-image_13737569.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .background-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+        }
+
+        .glass-shell {
+            width: 88vw;
+            max-width: 1300px;
+            height: 82vh;
+            background: rgba(15, 15, 25, 0.2);
+            backdrop-filter: blur(60px) saturate(220%);
+            -webkit-backdrop-filter: blur(60px) saturate(220%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-squircle);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 60px 120px rgba(0, 0, 0, 0.6);
+            transition: all 0.7s var(--transition-fluid);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .glass-shell.is-immersive {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+            background: rgba(0, 0, 0, 0.98);
+        }
+
+        .header {
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .bubble {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 28px;
+            border-radius: var(--radius-bubble);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+            transition: all 0.4s var(--transition-fluid);
+        }
+
+        .title-bubble h1 {
+            font-weight: 800;
+            font-size: clamp(1rem, 2.8vw, 1.4rem);
+            background: linear-gradient(180deg, #ffffff 0%, #d1d1d1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .fs-toggle {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 18px;
+        }
+
+        .counter-pill {
+            color: var(--accent-color);
+            font-weight: 900;
+            font-size: 1.1rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .viewport {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: all 0.8s var(--transition-fluid);
+            transform: scale(0.92) translateY(30px);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .slide img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            border-radius: var(--radius-island);
+            box-shadow: 0 50px 110px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .controls {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 25px;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        .nav-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.4s var(--transition-fluid);
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-color);
+            color: #000;
+            transform: scale(1.1);
+        }
+
+        .thumb-nav {
+            height: 120px;
+            display: flex;
+            gap: 15px;
+            padding: 20px 50px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .thumb-nav::-webkit-scrollbar { display: none; }
+
+        .thumbnail {
+            flex: 0 0 100px;
+            height: 80px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            opacity: 0.4;
+            object-fit: cover;
+            transition: 0.3s;
+        }
+
+        .thumbnail.active {
+            opacity: 1;
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: 0.5s;
+        }
+
+        @media (max-width: 768px) {
+            .controls { display: none; }
+            .header { padding: 20px; flex-direction: column; gap: 10px; }
+            .glass-shell { width: 95vw; height: 90vh; }
+        }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>15 - Parts - QKWIP</title>
+</head>
+<body>
 
-<body><center><a href="#END"><button>الذهاب إلى الأسفل</button></a>
-    <center><nav><a href="#"><button><</button></a><a href="#END"><button>></button></a><br>
- </nav></center>
-  <img src="../الجزء 15/1.png" alt="">
-  <img src="../الجزء 15/2.png" alt="">
-  <img src="../الجزء 15/3.png" alt="">
-  <img src="../الجزء 15/4.png" alt="">
-  <img src="../الجزء 15/5.png" alt="">
-  <img src="../الجزء 15/6.png" alt="">
-   <img src="../الجزء 15/7.png" alt="">
-   <img src="../الجزء 15/8.png" alt="">
-   <img src="../الجزء 15/9.png" alt="">
-   <img src="../الجزء 15/10.png" alt="">
-   <img src="../الجزء 15/11.png" alt="">
-   <img src="../الجزء 15/12.png" alt="">
-   <img src="../الجزء 15/13.png" alt="">
-   <img src="../الجزء 15/14.png" alt="">
-   <img src="../الجزء 15/15.png" alt="">
-   <img src="../الجزء 15/16.png" alt="">
-	<img src="../الجزء 15/17.png" alt="">
-	<img src="../الجزء 15/18.png" alt="">
-	<img src="../الجزء 15/19.png" alt="">
-	<img src="../الجزء 15/20.png" alt="">
-	<img src="../الجزء 15/21.png" alt="">
-	<img src="../الجزء 15/22.png" alt="">
-	<img src="../الجزء 15/23.png" alt="">
-	<img src="../الجزء 15/24.png" alt="">
-	<img src="../الجزء 15/25.png" alt="">
-	<img src="../الجزء 15/26.png" alt="">
-	 <img src="../الجزء 15/27.png" alt="">
-	 <img src="../الجزء 15/28.png" alt="">
-	 <img src="../الجزء 15/29.png" alt="">
-	 <img src="../الجزء 15/30.png" alt="">
-	 <img src="../الجزء 15/31.png" alt="">
-	 <img src="../الجزء 15/32.png" alt="">
-	 <img src="../الجزء 15/33.png" alt="">
-	 <img src="../الجزء 15/34.png" alt="">
-	 <img src="../الجزء 15/35.png" alt="">
-	 <img src="../الجزء 15/36.png" alt="">
-	  <img src="../الجزء 15/37.png" alt="">
-	  <img src="../الجزء 15/38.png" alt="">
-	  <img src="../الجزء 15/39.png" alt="">
-	  <img src="../الجزء 15/40.png" alt="">
-	  <img src="../الجزء 15/41.png" alt="">
-	  <img src="../الجزء 15/42.png" alt="">
-	  <img src="../الجزء 15/43.png" alt="">
-	  <img src="../الجزء 15/44.png" alt="">
-	  <img src="../الجزء 15/45.png" alt="">
-	  <img src="../الجزء 15/46.png" alt="">
-	   <img src="../الجزء 15/47.png" alt="">
-	   <img src="../الجزء 15/48.png" alt="">
-	   <img src="../الجزء 15/49.png" alt="">
-	   <img src="../الجزء 15/50.png" alt="">
-	   <img src="../الجزء 15/51.png" alt="">
-	   <img src="../الجزء 15/52.png" alt="">
-	   <img src="../الجزء 15/53.png" alt="">
-	   <img src="../الجزء 15/54.png" alt="">
-	   <img src="../الجزء 15/55.png" alt="">
-	   <img src="../الجزء 15/56.png" alt="">
-		<img src="../الجزء 15/57.png" alt="">
-		<img src="../الجزء 15/58.png" alt="">
-		<img src="../الجزء 15/59.png" alt="">
-		<img src="../الجزء 15/60.png" alt="">
-		 <img src="../الجزء 15/61.png" alt="">
-		 <img src="../الجزء 15/62.png" alt="">
-		 <img src="../الجزء 15/63.png" alt=""><div id="END"></div>
-<a href="#"><button>الرجوع إلى الأعلى</button></a>
-</center></body></html>
+    <div class="custom-background"></div>
+    <div class="background-overlay"></div>
+
+    <div class="glass-shell" id="main-app">
+        <div class="header">
+            <div class="bubble title-bubble">
+                <h1>القرآن الكريم كلمة في صورة</h1>
+            </div>
+
+            <div class="bubble action-bubble">
+                <button class="fs-toggle" onclick="toggleImmersive()" id="fs-btn">ملء الشاشة</button>
+                <div class="counter-pill" id="counter">٠٠ / ٠٠</div>
+            </div>
+        </div>
+
+        <div class="viewport" id="viewport">
+            <div class="controls">
+                <button class="nav-btn" onclick="changeSlide(1)">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" transform="scale(-1, 1)"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button class="nav-btn" onclick="changeSlide(-1)">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+        </div>
+
+        <div class="thumb-nav" id="thumb-nav"></div>
+    </div>
+
+    <script>
+        const imageSources = [
+            "https://thumbs2.imgbox.com/f2/3d/3rPIrKyM_t.png",
+            "https://thumbs2.imgbox.com/74/8d/uHR3ZzW4_t.png",
+            "https://thumbs2.imgbox.com/16/4c/Vh8XG3PC_t.png",
+            "https://thumbs2.imgbox.com/95/fc/5oA6sjnW_t.png",
+            "https://thumbs2.imgbox.com/e6/4e/pSYLVT7S_t.png",
+            "https://thumbs2.imgbox.com/d2/e0/dor6YQOq_t.png",
+            "https://thumbs2.imgbox.com/15/bf/NYWrPj6O_t.png",
+            "https://thumbs2.imgbox.com/e3/ca/SOY42F8c_t.png",
+            "https://thumbs2.imgbox.com/f6/ec/MYghs5rO_t.png",
+            "https://thumbs2.imgbox.com/e3/37/bTCe8DwP_t.png",
+            "https://thumbs2.imgbox.com/cf/2a/iOuAlA7T_t.png",
+            "https://thumbs2.imgbox.com/31/10/EAW9gpMZ_t.png",
+            "https://thumbs2.imgbox.com/4b/df/h1KR0cqu_t.png",
+            "https://thumbs2.imgbox.com/cd/ea/VHFirrk6_t.png",
+            "https://thumbs2.imgbox.com/2e/87/TXfn8mwf_t.png",
+            "https://thumbs2.imgbox.com/73/dd/f2L7ovlc_t.png",
+            "https://thumbs2.imgbox.com/f5/b3/mXDGZ8Qh_t.png",
+            "https://thumbs2.imgbox.com/89/88/tOpLSBGV_t.png",
+            "https://thumbs2.imgbox.com/d5/ae/89nTa0Vk_t.png",
+            "https://thumbs2.imgbox.com/37/57/N2A4bVIS_t.png",
+            "https://thumbs2.imgbox.com/ac/e9/X2dDx9Zi_t.png",
+            "https://thumbs2.imgbox.com/63/2e/oDsWQ9V3_t.png",
+            "https://thumbs2.imgbox.com/82/ca/RF30WTMB_t.png",
+            "https://thumbs2.imgbox.com/40/8e/LkGTFQIQ_t.png",
+            "https://thumbs2.imgbox.com/bf/0c/BRKJRAsE_t.png",
+            "https://thumbs2.imgbox.com/7c/02/5fXUAj5g_t.png",
+            "https://thumbs2.imgbox.com/3c/10/lX2231jd_t.png",
+            "https://thumbs2.imgbox.com/76/dc/9yZJs5Eq_t.png",
+            "https://thumbs2.imgbox.com/b2/4f/uBDe7cUT_t.png",
+            "https://thumbs2.imgbox.com/c3/b6/SAfdfAOX_t.png",
+            "https://thumbs2.imgbox.com/e2/9e/SmwMwibI_t.png",
+            "https://thumbs2.imgbox.com/3b/1d/6v0GiPQ8_t.png",
+            "https://thumbs2.imgbox.com/2b/da/b6yeWxYZ_t.png",
+            "https://thumbs2.imgbox.com/44/69/rHnHVDq0_t.png",
+            "https://thumbs2.imgbox.com/4e/07/tOAUT6ux_t.png",
+            "https://thumbs2.imgbox.com/f9/d7/mGKivGK0_t.png",
+            "https://thumbs2.imgbox.com/56/5f/dpH8zK1f_t.png",
+            "https://thumbs2.imgbox.com/f5/90/x791uoBn_t.png",
+            "https://thumbs2.imgbox.com/fd/4d/Cdaeet8Q_t.png",
+            "https://thumbs2.imgbox.com/eb/22/DC3W5BhW_t.png",
+            "https://thumbs2.imgbox.com/83/d5/OmZw2nI9_t.png",
+            "https://thumbs2.imgbox.com/5d/09/BMNp2uFr_t.png",
+            "https://thumbs2.imgbox.com/1f/ee/g9ONRAYU_t.png",
+            "https://thumbs2.imgbox.com/78/74/9wZSIco7_t.png",
+            "https://thumbs2.imgbox.com/d2/ae/WOXF84vz_t.png",
+            "https://thumbs2.imgbox.com/d4/a5/4bsezrU2_t.png",
+            "https://thumbs2.imgbox.com/74/0c/MUvSAvGN_t.png",
+            "https://thumbs2.imgbox.com/28/d8/7zRCQsHs_t.png",
+            "https://thumbs2.imgbox.com/55/d5/sLI566Ss_t.png",
+            "https://thumbs2.imgbox.com/cd/11/7ohRV7Xx_t.png",
+            "https://thumbs2.imgbox.com/7b/4c/st7WBmEA_t.png",
+            "https://thumbs2.imgbox.com/2d/35/9vl41ztB_t.png",
+            "https://thumbs2.imgbox.com/54/14/M1GCWMX1_t.png",
+            "https://thumbs2.imgbox.com/2f/a4/c5bPIhmw_t.png",
+            "https://thumbs2.imgbox.com/4b/09/MziPWRby_t.png",
+            "https://thumbs2.imgbox.com/7f/45/5XOqlb2o_t.png",
+            "https://thumbs2.imgbox.com/be/6d/cBCpkbVu_t.png",
+            "https://thumbs2.imgbox.com/b2/dd/ewctMU4Z_t.png",
+            "https://thumbs2.imgbox.com/a0/73/f5adyS49_t.png",
+            "https://thumbs2.imgbox.com/1b/45/RgeWl2Hl_t.png",
+            "https://thumbs2.imgbox.com/b2/f1/ImN9S8pc_t.png",
+            "https://thumbs2.imgbox.com/25/99/kxE1VLes_t.png",
+            "https://thumbs2.imgbox.com/eb/f3/Z4zDnkSQ_t.png"
+        ];
+        
+        let currentIndex = 0;
+        let isImmersive = false;
+        let touchStartX = 0;
+
+        function toArabicDigits(num) {
+            const id = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return num.toString().replace(/[0-9]/g, w => id[+w]);
+        }
+
+        function init() {
+            const viewport = document.getElementById('viewport');
+            const thumbNav = document.getElementById('thumb-nav');
+
+            imageSources.forEach((src, index) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${index === currentIndex ? 'active' : ''}`;
+                const img = document.createElement('img');
+                img.src = src;
+                img.onerror = () => { img.src = 'https://via.placeholder.com/800?text=Image+Load+Error'; };
+                slide.appendChild(img);
+                viewport.appendChild(slide);
+
+                const thumb = document.createElement('img');
+                thumb.src = src;
+                thumb.className = `thumbnail ${index === currentIndex ? 'active' : ''}`;
+                thumb.onclick = () => goToSlide(index);
+                thumbNav.appendChild(thumb);
+            });
+            updateUI();
+        }
+
+        function changeSlide(dir) {
+            let next = (currentIndex + dir + imageSources.length) % imageSources.length;
+            goToSlide(next);
+        }
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const thumbs = document.querySelectorAll('.thumbnail');
+            
+            if (slides[currentIndex]) slides[currentIndex].classList.remove('active');
+            if (thumbs[currentIndex]) thumbs[currentIndex].classList.remove('active');
+            
+            currentIndex = index;
+            
+            if (slides[currentIndex]) slides[currentIndex].classList.add('active');
+            if (thumbs[currentIndex]) {
+                thumbs[currentIndex].classList.add('active');
+                thumbs[currentIndex].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+            }
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const cur = toArabicDigits(String(currentIndex + 1).padStart(2, '0'));
+            const tot = toArabicDigits(String(imageSources.length).padStart(2, '0'));
+            document.getElementById('counter').innerText = `${cur} / ${tot}`;
+            document.getElementById('progress').style.width = ((currentIndex + 1) / imageSources.length) * 100 + '%';
+        }
+
+        function toggleImmersive() {
+            isImmersive = !isImmersive;
+            document.getElementById('main-app').classList.toggle('is-immersive', isImmersive);
+            document.getElementById('fs-btn').innerText = isImmersive ? "تصغير" : "ملء الشاشة";
+        }
+
+        // Touch & Swiping
+        document.getElementById('viewport').addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.getElementById('viewport').addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                changeSlide(diff > 0 ? 1 : -1);
+            }
+        });
+
+        window.onload = init;
+    </script>
+</body>
+</html>
