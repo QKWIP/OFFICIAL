@@ -353,7 +353,7 @@
             <div class="bubble action-bubble">
                 <button class="fs-toggle" onclick="toggleImmersive()" id="fs-btn">ملء الشاشة</button>
                 <div style="width: 1px; height: 20px; background: var(--glass-border);"></div>
-                <div class="counter-pill" id="counter">٠١ / ٢٧</div>
+                <div class="counter-pill" id="counter">٠١ / ١٢</div>
             </div>
         </div>
 
@@ -380,35 +380,20 @@
     </div>
 
     <script>
-        // Updated Image Sources List (27 images)
+        // Updated Image Sources List (12 images)
         const imageSources = [
-            "https://thumbs2.imgbox.com/1d/c7/2kenwqKd_t.png",
-            "https://thumbs2.imgbox.com/50/ca/I0DJV7nY_t.png",
-            "https://thumbs2.imgbox.com/36/29/NmwEFpxk_t.png",
-            "https://thumbs2.imgbox.com/a2/dd/O8fE0hwE_t.png",
-            "https://thumbs2.imgbox.com/46/ba/jHk7Tf1s_t.png",
-            "https://thumbs2.imgbox.com/ea/75/1fmOqMWW_t.png",
-            "https://thumbs2.imgbox.com/63/5c/ix9Mjw6j_t.png",
-            "https://thumbs2.imgbox.com/2c/29/eLii5EAR_t.png",
-            "https://thumbs2.imgbox.com/dd/64/lPXj60Tv_t.png",
-            "https://thumbs2.imgbox.com/93/f6/mVdTEGvM_t.png",
-            "https://thumbs2.imgbox.com/df/9e/Gx7qBgzA_t.png",
-            "https://thumbs2.imgbox.com/fd/c6/bpK8VJ0H_t.png",
-            "https://thumbs2.imgbox.com/e8/bc/DiEzrtTM_t.png",
-            "https://thumbs2.imgbox.com/b6/00/F5p0sqdT_t.png",
-            "https://thumbs2.imgbox.com/ea/e6/4B5v6sPy_t.png",
-            "https://thumbs2.imgbox.com/76/74/A6zZz8vP_t.png",
-            "https://thumbs2.imgbox.com/f8/88/dlUEjUFF_t.png",
-            "https://thumbs2.imgbox.com/87/45/KpdtmDfU_t.png",
-            "https://thumbs2.imgbox.com/ef/df/Y1I1c2dG_t.png",
-            "https://thumbs2.imgbox.com/d1/95/BSxcTAJ2_t.png",
-            "https://thumbs2.imgbox.com/b8/e7/VfBVfWCd_t.png",
-            "https://thumbs2.imgbox.com/b9/9e/O8n9Cszt_t.png",
-            "https://thumbs2.imgbox.com/a5/f7/gXyETTCn_t.png",
-            "https://thumbs2.imgbox.com/4e/a7/XeVxDEJv_t.png",
-            "https://thumbs2.imgbox.com/8d/fc/8hhHHrXh_t.png",
-            "https://thumbs2.imgbox.com/8e/62/9prbvBc0_t.png",
-            "https://thumbs2.imgbox.com/2c/40/nVIY1CLp_t.png"
+            "https://thumbs2.imgbox.com/ac/6d/HSIZpVFe_t.png",
+            "https://thumbs2.imgbox.com/29/3a/VryJlzti_t.png",
+            "https://thumbs2.imgbox.com/1b/b8/TIsC11pu_t.png",
+            "https://thumbs2.imgbox.com/bb/9a/Wg60NEWL_t.png",
+            "https://thumbs2.imgbox.com/ab/43/2fi12U8Y_t.png",
+            "https://thumbs2.imgbox.com/85/e9/WslSwmiA_t.png",
+            "https://thumbs2.imgbox.com/51/a2/XXf6Tn0N_t.png",
+            "https://thumbs2.imgbox.com/94/66/p1L44cWa_t.png",
+            "https://thumbs2.imgbox.com/c6/41/umkmksrB_t.png",
+            "https://thumbs2.imgbox.com/5d/0f/u8bI3svI_t.png",
+            "https://thumbs2.imgbox.com/ff/4e/PppC06X7_t.png",
+            "https://thumbs2.imgbox.com/e8/00/1kwILO8j_t.png"
         ];
         
         let currentIndex = 0;
@@ -427,6 +412,10 @@
         }
 
         function init() {
+            // Clear existing elements for clean refresh
+            viewport.querySelectorAll('.slide').forEach(el => el.remove());
+            thumbNav.innerHTML = '';
+
             imageSources.forEach((src, index) => {
                 const slide = document.createElement('div');
                 slide.className = `slide ${index === currentIndex ? 'active' : ''}`;
@@ -458,9 +447,13 @@
         function goToSlide(index) {
             const slides = document.querySelectorAll('.slide');
             const thumbs = document.querySelectorAll('.thumbnail');
+            if (!slides[currentIndex] || !thumbs[currentIndex]) return;
+            
             slides[currentIndex].classList.remove('active');
             thumbs[currentIndex].classList.remove('active');
+            
             currentIndex = index;
+            
             slides[currentIndex].classList.add('active');
             thumbs[currentIndex].classList.add('active');
             thumbs[currentIndex].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
