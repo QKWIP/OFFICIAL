@@ -13,236 +13,203 @@
     <style>
         :root {
             --accent-gold: #e5c05e;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.12);
+            --bg-deep: #050a0c;
+            --text-color: #ffffff;
+            --glass: rgba(255, 255, 255, 0.03);
+            --menu-bg: rgba(10, 15, 20, 0.9);
+            --blob-opacity: 0.5;
         }
 
+        @media (prefers-color-scheme: light) {
+            :root {
+                --accent-gold: #b48a2e;
+                --bg-deep: #f0f4f8;
+                --text-color: #0f172a;
+                --glass: rgba(0, 0, 0, 0.04);
+                --menu-bg: rgba(255, 255, 255, 0.9);
+                --blob-opacity: 0.25;
+            }
+        }
+
+        ::-webkit-scrollbar { display: none; }
+        html { scroll-behavior: smooth; }
+        
         body {
             font-family: 'Noto Kufi Arabic', sans-serif;
-            scroll-behavior: smooth;
-            background-color: #081115;
-            color: #ffffff;
-            -webkit-user-select: none;
-            -ms-user-select: none;
+            background-color: var(--bg-deep);
+            color: var(--text-color);
             user-select: none;
             overflow-x: hidden;
+            margin: 0;
+            min-height: 100vh;
         }
 
-        /* Background & Blobs */
-        .liquid-bg {
+        /* Fast & Smooth Animated Background */
+        .animated-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #0d262d 0%, #081115 100%);
+            background: linear-gradient(125deg, var(--bg-deep), #0d2a35, #081a21, var(--bg-deep));
+            background-size: 300% 300%;
+            animation: meshGradient 10s linear infinite; /* Faster and Linear */
+        }
+
+        @keyframes meshGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .blob {
             position: absolute;
-            width: 700px; height: 700px;
-            background: linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, rgba(229, 192, 94, 0.08) 100%);
-            filter: blur(120px);
-            border-radius: 50%;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 65%);
+            filter: blur(100px);
+            opacity: var(--blob-opacity);
             z-index: -1;
-            animation: move 30s infinite alternate ease-in-out;
-            pointer-events: none;
+            animation: moveBlobs 12s infinite linear alternate; /* Faster motion */
         }
 
-        @keyframes move {
+        @keyframes moveBlobs {
             0% { transform: translate(-15%, -15%) rotate(0deg) scale(1); }
-            50% { transform: translate(20%, 15%) rotate(180deg) scale(1.1); }
-            100% { transform: translate(-10%, 25%) rotate(360deg) scale(1); }
+            100% { transform: translate(25%, 25%) rotate(90deg) scale(1.3); }
         }
 
-        /* Glass Foundations */
-        .liquid-glass {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 28px;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            overflow: hidden;
+        .bubble-header {
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1100px;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            z-index: 1000;
+            padding: 10px 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
 
-        /* Advanced Hover: Radial Spotlight Effect */
-        .liquid-glass::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(229, 192, 94, 0.08), transparent 40%);
-            opacity: 0;
-            transition: opacity 0.5s;
-            pointer-events: none;
+        .nav-item {
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.5;
         }
+        .nav-item:hover { opacity: 1; color: var(--accent-gold); transform: scale(1.1); }
 
-        .liquid-glass:hover::before {
-            opacity: 1;
-        }
-
-        .liquid-glass:hover {
-            border-color: rgba(229, 192, 94, 0.3);
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Juz Card Mastery */
-        .juz-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            perspective: 1000px;
-        }
-
-        .juz-card:hover {
-            background: var(--accent-gold);
-            color: #081115 !important;
-            transform: translateY(-10px) scale(1.08) rotateX(10deg);
-            box-shadow: 0 20px 40px rgba(229, 192, 94, 0.3), 0 0 0 4px rgba(229, 192, 94, 0.1);
-            z-index: 20;
-        }
-
-        .juz-card .part-label {
-            transition: transform 0.3s ease;
-        }
-
-        .juz-card:hover .part-label {
-            transform: translateY(-3px);
-            color: rgba(8, 17, 21, 0.6);
-        }
-
-        /* Golden Button Mechanics */
         .gold-button {
             background: linear-gradient(45deg, #d4af37, #fcf6ba, #aa771c);
             background-size: 200% 200%;
             color: #081115;
-            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
         }
+        .gold-button:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4); }
 
-        .gold-button:hover {
-            background-position: right center;
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4);
-        }
-
-        /* Navbar Sophistication */
-        .nav-link {
-            position: relative;
-            padding: 0.5rem 0;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 50%;
-            width: 0; height: 2px;
-            background: var(--accent-gold);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-
-        .nav-link:hover::before {
-            width: 100%;
-        }
-
-        .nav-link:hover {
-            color: var(--accent-gold);
-            text-shadow: 0 0 15px rgba(229, 192, 94, 0.3);
-        }
-
-        /* Contact Cards Refinement */
-        .social-card {
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .social-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(-10px);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .social-card:hover .icon-box {
-            transform: scale(1.2) rotate(-10deg);
-            filter: drop-shadow(0 0 10px currentColor);
-        }
-
-        /* Utility */
         .quran-font { font-family: 'Amiri', serif; }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 10px; }
+
+        .juz-card {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2.5rem;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .juz-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            background: rgba(229, 192, 94, 0.12);
+            border-color: var(--accent-gold);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 40px;
+            padding: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        #security-hint {
+            position: fixed;
+            padding: 12px 24px;
+            background: var(--accent-gold);
+            color: #000;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            pointer-events: none;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            transform: translate(-50%, -130%);
+        }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body oncontextmenu="handleSecurity(event); return false;" onselectstart="handleSecurity(event); return false;">
 
-    <div class="liquid-bg">
-        <div class="blob" style="top: -10%; left: -10%;"></div>
-        <div class="blob" style="bottom: -10%; right: -10%; animation-delay: -5s;"></div>
-    </div>
+    <div id="security-hint">المحتوى محمي وحقوق الطبع محفوظة</div>
 
-    <!-- Navigation -->
-    <nav class="fixed w-full z-50 py-4 transition-all duration-500" id="navbar">
-        <div class="container mx-auto px-6">
-            <div class="liquid-glass px-6 py-3 flex justify-between items-center bg-opacity-40">
-                <div class="text-2xl font-black text-white tracking-tighter flex items-center gap-2 group cursor-pointer">
-                    <span class="w-9 h-9 gold-button rounded-xl flex items-center justify-center text-teal-950 text-sm group-hover:rotate-[360deg] transition-transform duration-700">Q</span>
-                    <span class="group-hover:text-amber-400 transition-colors duration-500">#QKWIP</span>
-                </div>
-                <div class="hidden md:flex space-x-reverse space-x-8 items-center">
-                    <a href="#home" class="nav-link text-gray-300 text-sm font-medium">الرئيسية</a>
-                    <a href="#parts" class="nav-link text-gray-300 text-sm font-medium">أجزاء القرآن</a>
-                    <a href="#contact" class="gold-button px-7 py-2.5 rounded-xl text-xs uppercase tracking-widest">تواصل معنا</a>
-                </div>
+    <div class="animated-bg"></div>
+    <div class="blob" style="top: -15%; left: -10%;"></div>
+    <div class="blob" style="bottom: -15%; right: -10%; animation-delay: -3s;"></div>
+
+    <!-- Header -->
+    <header class="bubble-header">
+        <div class="flex justify-between items-center">
+            <div onclick="scrollToSection('home')" class="flex items-center gap-3 cursor-pointer group">
+                <span class="w-10 h-10 gold-button rounded-full flex items-center justify-center text-sm font-black shadow-lg">Q</span>
+                <span class="font-black text-xl tracking-tighter">QKWIP</span>
+            </div>
+            
+            <nav class="flex items-center gap-6 md:gap-12">
+                <span onclick="scrollToSection('home')" class="nav-item">الرئيسية</span>
+                <span onclick="scrollToSection('parts')" class="nav-item">الأجزاء</span>
+                <span onclick="scrollToSection('legal')" class="nav-item">الخصوصية</span>
+                <span onclick="scrollToSection('legal')" class="nav-item">شروط الإستخدام</span>
+                <span onclick="scrollToSection('social')" class="nav-item">تواصل</span>
+            </nav>
+
+            <div class="hidden md:block">
+                <span class="text-[9px] opacity-20 font-bold uppercase tracking-[0.3em]"></span>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center pt-20">
+    <!-- Hero -->
+    <section id="home" class="min-h-screen flex items-center justify-center pt-20">
         <div class="container mx-auto px-6 text-center">
-            <div class="inline-block px-5 py-2 mb-8 liquid-glass text-amber-400 text-[10px] font-black tracking-[0.3em] uppercase hover:bg-white/5 cursor-default" data-aos="fade-down">
-                رحلة بصرية في كتاب الله
-            </div>
-            <h1 class="text-6xl md:text-9xl font-bold mb-10 leading-[1.1] quran-font select-none" data-aos="fade-up" data-aos-delay="200">
+            <h1 class="text-6xl md:text-[8rem] font-bold mb-6 leading-[1.1] quran-font" data-aos="zoom-out">
                 القرآن الكريم <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-500 to-amber-200 hover:tracking-widest transition-all duration-1000 cursor-default">كلمة في صورة</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200">كلمة في صورة</span>
             </h1>
-            <p class="text-lg md:text-2xl max-w-4xl mx-auto leading-relaxed mb-14 text-gray-400 font-light" data-aos="fade-up" data-aos-delay="400">
-                مشروع "القرآن الكريم كلمة في صورة" هو رحلة بصرية تدبرية تهدف إلى تقريب معاني القرآن الكريم من خلال تصاميم إبداعية تجمع بين جمال الكلمة وعمق الصورة.
+            <p class="text-lg md:text-2xl max-w-2xl mx-auto opacity-40 mb-12 font-light" data-aos="fade-up" data-aos-delay="200">
+                مشروع دعوي يدمج جماليات الفن الرقمي بقدسية الآيات القرآنية لتعزيز التدبر البصري.
             </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-6" data-aos="fade-up" data-aos-delay="600">
-                <a href="#parts" class="gold-button px-14 py-5 rounded-2xl text-lg shadow-2xl">
-                    تصفح الأجزاء
-                </a>
-                <a href="#contact" class="liquid-glass text-white px-14 py-5 rounded-2xl font-bold text-lg hover:bg-white/10 transition">
-                    انضم إلينا
-                </a>
+            <div data-aos="fade-up" data-aos-delay="400">
+                <button onclick="scrollToSection('parts')" class="gold-button px-14 py-5 rounded-full text-lg font-black shadow-2xl">تصفح المصحف</button>
             </div>
         </div>
     </section>
 
-    <!-- Parts Selection Section -->
-    <section id="parts" class="py-32 relative">
+    <!-- Parts Grid -->
+    <section id="parts" class="py-24">
         <div class="container mx-auto px-6">
-            <div class="text-center mb-20" data-aos="fade-up">
-                <h2 class="text-5xl font-black text-white mb-6">أجزاء القرآن الكريم</h2>
-                <p class="text-gray-400 font-light text-lg">استكشف جمال الآيات من خلال الأجزاء الثلاثين</p>
-                <div class="w-20 h-1.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent mx-auto mt-8 rounded-full"></div>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-6">
+            <h2 class="text-4xl font-black mb-20 text-center quran-font" data-aos="fade-down">فهرس الأجزاء</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-10">
                 <script>
-                    for (let i = 1; i <= 30; i++) {
+                    const arabicWords = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس", "السابع", "الثامن", "التاسع", "العاشر", "الحادي عشر", "الثاني عشر", "الثالث عشر", "الرابع عشر", "الخامس عشر", "السادس عشر", "السابع عشر", "الثامن عشر", "التاسع عشر", "العشرون", "الحادي والعشرون", "الثاني والعشرون", "الثالث والعشرون", "الرابع والعشرون", "الخامس والعشرون", "السادس والعشرون", "السابع والعشرون", "الثامن والعشرون", "التاسع والعشرون", "الثلاثون"];
+                    for (let i = 0; i < 30; i++) {
                         document.write(`
-                            <a href="${i}.html" class="juz-card p-8 rounded-[2rem] text-center flex flex-col items-center justify-center gap-3 group" data-aos="fade-up" data-aos-delay="${(i % 6) * 50}">
-                                <span class="part-label text-[10px] text-gray-500 uppercase tracking-[0.2em] font-black">Part</span>
-                                <span class="text-4xl font-black quran-font leading-none">${i}</span>
-                                <div class="w-0 h-0.5 bg-black/20 group-hover:w-8 transition-all duration-500"></div>
-                            </a>
+                            <div class="juz-card p-12 text-center cursor-pointer group" data-aos="fade-up" data-aos-delay="${(i%5)*30}">
+                                <div class="text-amber-500/10 text-5xl mb-4 font-black transition-all group-hover:text-amber-500/40">${i+1}</div>
+                                <span class="text-xl font-bold quran-font opacity-40 group-hover:opacity-100 transition-all">الجزء ${arabicWords[i]}</span>
+                            </div>
                         `);
                     }
                 </script>
@@ -250,97 +217,78 @@
         </div>
     </section>
 
-    <!-- Footer / Contact Section -->
-    <footer id="contact" class="py-24">
+    <!-- Legal Section (Terms & Privacy) -->
+    <section id="legal" class="py-24">
         <div class="container mx-auto px-6">
-            <div class="liquid-glass p-12 md:p-20 relative z-10" data-aos="fade-up">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-                    <div>
-                        <h2 class="text-5xl font-black mb-8">تواصل معنا</h2>
-                        <p class="text-gray-300 text-xl mb-12 leading-relaxed font-light">
-                            نحن هنا للإجابة على تساؤلاتكم أو لاستقبال مساهماتكم الإبداعية في مشروع #QKWIP
-                        </p>
-                        
-                        <div class="flex flex-col gap-5">
-                            <a href="https://t.me/QKWIP" target="_blank" class="social-card flex items-center justify-between p-6 rounded-2xl bg-white/5">
-                                <div class="flex items-center gap-5">
-                                    <div class="icon-box w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 text-2xl transition-all">✈</div>
-                                    <span class="font-bold">Telegram</span>
-                                </div>
-                                <span class="text-gray-500 text-sm">@QKWIP</span>
-                            </a>
-                            <a href="https://youtube.com/@qkwip-official" target="_blank" class="social-card flex items-center justify-between p-6 rounded-2xl bg-white/5">
-                                <div class="flex items-center gap-5">
-                                    <div class="icon-box w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center text-red-400 text-2xl transition-all">▶</div>
-                                    <span class="font-bold">YouTube</span>
-                                </div>
-                                <span class="text-gray-500 text-sm">@QKWIP</span>
-                            </a>
-                            <a href="https://www.facebook.com/QuranKareemWordInPicture/" target="_blank" class="social-card flex items-center justify-between p-6 rounded-2xl bg-white/5">
-                                <div class="flex items-center gap-5">
-                                    <div class="icon-box w-12 h-12 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500 text-2xl font-bold transition-all">f</div>
-                                    <span class="font-bold">Facebook</span>
-                                </div>
-                                <span class="text-gray-500 text-sm">QKWIP Official</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="lg:pl-10">
-                        <div class="liquid-glass p-12 border-amber-500/10 hover:border-amber-500/40 text-center">
-                            <div class="text-7xl mb-6 hover:scale-110 transition-transform cursor-default inline-block">✉️</div>
-                            <h3 class="text-3xl font-black mb-3">راسلنا مباشرة</h3>
-                            <p class="text-amber-400 font-medium mb-10">Quran.Kareem.word.in.picture@gmail.com</p>
-                            <button class="gold-button w-full py-5 rounded-2xl uppercase tracking-widest text-xs font-black">ابدأ المراسلة الآن</button>
-                        </div>
+            <div class="grid md:grid-cols-2 gap-10">
+                <!-- Terms -->
+                <div class="info-section" data-aos="fade-left">
+                    <h3 class="text-3xl font-black mb-6 text-amber-500 quran-font">شروط الاستخدام</h3>
+                    <div class="space-y-4 opacity-50 text-sm leading-relaxed">
+                        <p>١. جميع التصاميم الفنية في هذا الموقع هي ملكية فكرية لمشروع QKWIP ويُمنع نسبها لغير المصدر.</p>
+                        <p>٢. يُسمح بإعادة نشر المحتوى في القنوات الدعوية والمواقع غير الربحية مع الحفاظ على شعار المشروع.</p>
+                        <p>٣. يُحظر تماماً تعديل الصور أو قصها أو استخدامها في أغراض تجارية أو ترويجية خاصة دون إذن كتابي.</p>
+                        <p>٤. استخدامك للموقع يعني موافقتك على هذه الشروط كجزء من الميثاق الأخلاقي لنشر العلم النافع.</p>
                     </div>
                 </div>
-
-                <div class="mt-20 pt-10 border-t border-white/5 text-center flex flex-col md:flex-row justify-between items-center gap-6">
-                    <p class="text-gray-500 text-sm font-medium">جميع الحقوق محفوظة لمشروع #QKWIP © ٢٠٢٦</p>
-                    <div class="flex gap-8 text-gray-500 text-xs font-bold tracking-widest uppercase">
-                        <a href="#" class="hover:text-amber-400 transition">Privacy</a>
-                        <a href="#" class="hover:text-amber-400 transition">Terms</a>
-                        <a href="#" class="hover:text-amber-400 transition">FAQ</a>
+                <!-- Privacy -->
+                <div class="info-section" data-aos="fade-right">
+                    <h3 class="text-3xl font-black mb-6 text-amber-500 quran-font">سياسة الخصوصية</h3>
+                    <div class="space-y-4 opacity-50 text-sm leading-relaxed">
+                        <p>• نحن لا نجمع أي بيانات تعريفية شخصية عن الزوار ولا نطلب تسجيل الدخول للوصول للأرشيف.</p>
+                        <p>• الموقع لا يستخدم ملفات تعريف ارتباط (Cookies) خارجية لتعقب سلوك المستخدم عبر الإنترنت.</p>
+                        <p>• الواجهة تتكيف تلقائياً مع إعدادات نظامك (داكن/فاتح) لضمان أفضل تجربة قراءة وحماية للعين.</p>
+                        <p>• أي مراسلات عبر البريد الإلكتروني الرسمي تظل سرية تماماً ولا تُشارك مع أي جهة ثالثة.</p>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- Social Section -->
+    <section id="social" class="py-24">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-black mb-16 quran-font">القنوات الرسمية</h2>
+            <div class="flex flex-wrap justify-center gap-8" data-aos="zoom-in">
+                <a href="https://www.facebook.com/QuranKareemWordInPicture/" target="_blank" class="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center hover:scale-110 hover:border-blue-600 transition-all group">
+                    <svg class="w-8 h-8 fill-white/20 group-hover:fill-blue-600" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a href="https://youtube.com/@qkwip-official" target="_blank" class="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center hover:scale-110 hover:border-red-500 transition-all group">
+                    <svg class="w-8 h-8 fill-white/20 group-hover:fill-red-500" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                </a>
+                <a href="mailto:Quran.kareem.word..in.picture@gmail.com" class="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center hover:scale-110 hover:border-amber-400 transition-all group">
+                    <svg class="w-8 h-8 fill-white/20 group-hover:fill-amber-400" viewBox="0 0 24 24"><path d="M0 3v18h24v-18h-24zm21.518 2l-9.518 7.713-9.518-7.713h19.036zm-19.518 14v-11.817l10 8.104 10-8.104v11.817h-20z"/></svg>
+                </a>
+                <a href="https://t.me/QKWIP" target="_blank" class="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center hover:scale-110 hover: Sky-500 transition-all group">
+                    <svg class="w-8 h-8 fill-white/20 group-hover:fill-sky-500" viewBox="0 0 24 24"><path d="M11.944 0c-6.603 0-11.944 5.341-11.944 11.944 0 6.603 5.341 11.944 11.944 11.944 6.603 0 11.944-5.341 11.944-11.944 0-6.603-5.341-11.944-11.944-11.944zm5.812 8.326l-1.897 8.95c-.141.636-.519.791-1.051.491l-2.883-2.126-1.391 1.336c-.154.154-.284.284-.582.284l.206-2.924 5.323-4.809c.232-.206-.051-.321-.361-.115l-6.577 4.137-2.834-.886c-.616-.192-.628-.616.128-.911l11.082-4.271c.513-.186.961.121.758.918z"/></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 text-center border-t border-white/5">
+        <p class="opacity-20 text-[11px] font-black tracking-[0.4em] uppercase">© ٢٠٢٦ مشروع QKWIP الرسمي • جميع الحقوق محفوظة</p>
     </footer>
 
     <script>
-        AOS.init({ duration: 1200, once: true, offset: 50 });
+        function handleSecurity(e) {
+            const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
+            const y = e.pageY || (e.touches ? e.touches[0].pageY : 0);
+            const hint = document.getElementById('security-hint');
+            hint.style.display = 'block';
+            hint.style.left = x + 'px'; hint.style.top = y + 'px';
+            setTimeout(() => hint.style.display = 'none', 1500);
+        }
 
-        // Mouse Spotlight Effect Logic
-        document.querySelectorAll('.liquid-glass').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.setProperty('--x', `${x}px`);
-                card.style.setProperty('--y', `${y}px`);
-            });
-        });
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) window.scrollTo({ top: el.offsetTop - 100, behavior: 'smooth' });
+        }
 
-        // Navbar Scroll Effect
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                nav.classList.add('py-2');
-                nav.querySelector('.liquid-glass').classList.add('bg-opacity-80', 'shadow-2xl');
-            } else {
-                nav.classList.remove('py-2');
-                nav.querySelector('.liquid-glass').classList.remove('bg-opacity-80', 'shadow-2xl');
-            }
-        });
-
-        // Security
-        document.addEventListener('keydown', e => {
-            if (e.ctrlKey && (e.key === 'u' || e.key === 'i' || e.key === 'j' || e.key === 's')) e.preventDefault();
-            if (e.key === 'F12') e.preventDefault();
+        document.addEventListener('DOMContentLoaded', () => {
+            AOS.init({ duration: 1000, once: true });
         });
     </script>
-
 </body>
 </html>
-
