@@ -1,150 +1,412 @@
-
-   <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>القرآن الكريم كلمة في صورة</title>
     <style>
-        body{
-            background-image:url('https://scontent.fkwi4-3.fna.fbcdn.net/v/t39.30808-6/327299292_1169105060406833_6580842356442991442_n.png?stp=dst-png_s960x960&_nc_cat=105&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=BgzDVC59ph4Q7kNvgHSz8Kn&_nc_oc=AdlUaUICs3RWY8yS2DWbb4AOzSgzb8PM2q7Eg-YP-LzYzKXz-yYw696F8omY4jbIN3Y&_nc_zt=23&_nc_ht=scontent.fkwi4-3.fna&_nc_gid=nXhfFvmJa8wQ_K5DaZWLhw&oh=00_AYGZxLAZzHR4uOM_icLw8BE1vGF9a12kQcOIzOjjkzhe7g&oe=67E1C93E');
-            color:white;
-            margin-top:-0.5%;
-            height:100%;
-            width:100%;          
-            height: 100vh; /* Full viewport height */
-            background-size: cover; /* Makes it similar to how videos are resized */
-            position:relative; /* Needed for overlay positioning */
+        :root {
+            /* Design Tokens */
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --accent-color: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.4);
+            --transition-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+            --radius-bubble: 30px;
+            --radius-squircle: 45px;
+            --radius-island: 35px;
         }
 
-          
-          .content {
-              display: inline-block; /* Ensure content aligns horizontally */
-          }
-          /* Optional: Add overlay styling to simulate video effect */
-          .overlay {
-            position: absolute;
-            margin-top: 0;
-            margin-left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay for a cinematic effect */
-            z-index: 1; /* Ensures it stays above the background */
-          }
-          
-          /* Content styling on top of the image */
-          .content {
-            position: relative;
-            z-index: 2;
-            color: white;
-            font-size: 24px;
-            text-align: center;
-            margin-top: 20%;
-          }
-        body{
-            color:white;
+        * {
             margin: 0;
-            overflow-y: scroll;
             padding: 0;
-            background:rgb(31,31,31);
-            font-family: segoe ui;
-        }  ::-webkit-scrollbar {
-            width: 1px; /* Width of the scrollbar */
-            background:rgb(31,31,31);
-          }
-          
-          ::-webkit-scrollbar-track {
-            background:rgb(31,31,31); /* No background for the track */
-            width:1px;
-          }
-          nav{
-            background:black;
-            color:white;
-            margin-top:0%;
-            height:3.6%;
-            width:100%;
-            position:fixed;
-          }
-          nav button{
-            width:50%;
-            font-size:100%;
-            background:rgb(165, 0, 18);
-            color:white;
-            font-family:segoe ui;
-            border-style:none;
-            cursor:pointer;
-          }
-          nav button:hover{
-            background:rgb(191, 38, 56);
-          }
-          ::-webkit-scrollbar-thumb {
-            background:rgb(31,31,31); /* Color of the scrollbar thumb */
-            border-radius: 10px; /* Rounded edges */
-            border: 0px solid transparent; /* Space between thumb and scrollbar track */
-            background-clip: padding-box;
-          }
-          
-          /* For Firefox */
-          html {
-            scrollbar-width: 1px; /* Thin scrollbar */
-            scrollbar-color:rgb(31,31,31);
-            scrollbar-track-color: rgb(191, 38, 56);
-          }
-          button{
-            width:100%;
-            font-size:100%;
-            background:rgb(165, 0, 18);
-            color:white;
-            font-family:'Times New Roman';
-            border-style:none;
-            cursor:pointer;
-          }
-          button:hover{
-            background:rgb(191, 38, 56);
-          }
+            box-sizing: border-box;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
+        body {
+            height: 100vh;
+            height: -webkit-fill-available;
+            overflow: hidden;
+            background: #050505;
+            color: var(--text-main);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
+        .custom-background {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image: url('https://png.pngtree.com/thumb_back/fw800/background/20231029/pngtree-blurred-bokeh-backdrop-unfocused-abstract-art-gallery-or-art-center-texture-image_13737569.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .background-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+        }
+
+        .glass-shell {
+            width: 88vw;
+            max-width: 1300px;
+            height: 82vh;
+            background: rgba(15, 15, 25, 0.2);
+            backdrop-filter: blur(60px) saturate(220%);
+            -webkit-backdrop-filter: blur(60px) saturate(220%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-squircle);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 60px 120px rgba(0, 0, 0, 0.6);
+            transition: all 0.7s var(--transition-fluid);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .glass-shell.is-immersive {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+            background: rgba(0, 0, 0, 0.98);
+        }
+
+        .header {
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .bubble {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 28px;
+            border-radius: var(--radius-bubble);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+            transition: all 0.4s var(--transition-fluid);
+        }
+
+        .title-bubble h1 {
+            font-weight: 800;
+            font-size: clamp(1rem, 2.8vw, 1.4rem);
+            background: linear-gradient(180deg, #ffffff 0%, #d1d1d1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .fs-toggle {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 18px;
+        }
+
+        .counter-pill {
+            color: var(--accent-color);
+            font-weight: 900;
+            font-size: 1.1rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .viewport {
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: all 0.8s var(--transition-fluid);
+            transform: scale(0.92) translateY(30px);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .slide img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            border-radius: var(--radius-island);
+            box-shadow: 0 50px 110px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .controls {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 25px;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        .nav-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.4s var(--transition-fluid);
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-color);
+            color: #000;
+            transform: scale(1.1);
+        }
+
+        .thumb-nav {
+            height: 120px;
+            display: flex;
+            gap: 15px;
+            padding: 20px 50px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .thumb-nav::-webkit-scrollbar { display: none; }
+
+        .thumbnail {
+            flex: 0 0 100px;
+            height: 80px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            opacity: 0.4;
+            object-fit: cover;
+            transition: 0.3s;
+        }
+
+        .thumbnail.active {
+            opacity: 1;
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: 0.5s;
+        }
+
+        @media (max-width: 768px) {
+            .controls { display: none; }
+            .header { padding: 20px; flex-direction: column; gap: 10px; }
+            .glass-shell { width: 95vw; height: 90vh; }
+        }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>26 - Parts - QKWIP</title>
+</head>
+<body>
 
-<body><center><a href="#END"><button>الذهاب إلى الأسفل</button></a>
-    <center><nav><a href="#"><button><</button></a><a href="#END"><button>></button></a><br>
- </nav></center>
+    <div class="custom-background"></div>
+    <div class="background-overlay"></div>
 
-<img src="../الجزء 29/1.png" alt="">
-<img src="../الجزء 29/2.png" alt="">
-<img src="../الجزء 29/3.png" alt="">
-<img src="../الجزء 29/4.png" alt="">
-<img src="../الجزء 29/5.png" alt="">
-<img src="../الجزء 29/6.png" alt="">
- <img src="../الجزء 29/7.png" alt="">
- <img src="../الجزء 29/8.png" alt="">
- <img src="../الجزء 29/9.png" alt="">
- <img src="../الجزء 29/10.png" alt="">
- <img src="../الجزء 29/11.png" alt="">
- <img src="../الجزء 29/12.png" alt="">
- <img src="../الجزء 29/13.png" alt="">
- <img src="../الجزء 29/14.png" alt="">
- <img src="../الجزء 29/15.png" alt="">
- <img src="../الجزء 29/16.png" alt="">
-  <img src="../الجزء 29/17.png" alt="">
-  <img src="../الجزء 29/18.png" alt="">
-  <img src="../الجزء 29/19.png" alt="">
-  <img src="../الجزء 29/20.png" alt="">
-  <img src="../الجزء 29/21.png" alt="">
-  <img src="../الجزء 29/22.png" alt="">
-  <img src="../الجزء 29/23.png" alt="">
-  <img src="../الجزء 29/24.png" alt="">
-  <img src="../الجزء 29/25.png" alt="">
-  <img src="../الجزء 29/26.png" alt="">
-   <img src="../الجزء 29/27.png" alt="">
-   <img src="../الجزء 29/28.png" alt="">
-   <img src="../الجزء 29/29.png" alt="">
-   <img src="../الجزء 29/30.png" alt="">
-   <img src="../الجزء 29/31.png" alt="">
-   <img src="../الجزء 29/32.png" alt="">
-   <img src="../الجزء 29/33.png" alt="">
-   <img src="../الجزء 29/34.png" alt="">
-   <img src="../الجزء 29/35.png" alt="">
-<div id="END"></div>
-<a href="#"><button>الرجوع إلى الأعلى</button></a>
-</center></body></html>
+    <div class="glass-shell" id="main-app">
+        <div class="header">
+            <div class="bubble title-bubble">
+                <h1>القرآن الكريم كلمة في صورة</h1>
+            </div>
+
+            <div class="bubble action-bubble">
+                <button class="fs-toggle" onclick="toggleImmersive()" id="fs-btn">ملء الشاشة</button>
+                <div class="counter-pill" id="counter">٠٠ / ٠٠</div>
+            </div>
+        </div>
+
+        <div class="viewport" id="viewport">
+            <div class="controls">
+                <button class="nav-btn" onclick="changeSlide(1)">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" transform="scale(-1, 1)"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button class="nav-btn" onclick="changeSlide(-1)">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+        </div>
+
+        <div class="thumb-nav" id="thumb-nav"></div>
+    </div>
+
+    <script>
+        const imageSources = [
+            "https://thumbs2.imgbox.com/0d/a1/3ZKYH3Pl_t.png",
+            "https://thumbs2.imgbox.com/a6/48/yZUaAJyG_t.jpg",
+            "https://thumbs2.imgbox.com/09/de/IdUSYwTp_t.jpg",
+            "https://thumbs2.imgbox.com/20/97/hVzbrMxg_t.png",
+            "https://thumbs2.imgbox.com/8b/43/dHg9DYAS_t.png",
+            "https://thumbs2.imgbox.com/fc/5f/Pev3dke8_t.jpg",
+            "https://thumbs2.imgbox.com/37/c5/SAdWZ2Um_t.png",
+            "https://thumbs2.imgbox.com/fb/21/5rYSPezy_t.png",
+            "https://thumbs2.imgbox.com/aa/45/98iP5MWk_t.png",
+            "https://thumbs2.imgbox.com/3c/6b/25vnaIlr_t.png",
+            "https://thumbs2.imgbox.com/3c/df/h0tp0onG_t.png",
+            "https://thumbs2.imgbox.com/29/62/fD1WLRWV_t.png",
+            "https://thumbs2.imgbox.com/6d/b6/HajfDyMb_t.png",
+            "https://thumbs2.imgbox.com/cc/e7/PY4Hj58A_t.jpg",
+            "https://thumbs2.imgbox.com/0c/5b/AUmL6x1F_t.png",
+            "https://thumbs2.imgbox.com/d8/c4/AABUxrFf_t.png",
+            "https://thumbs2.imgbox.com/ed/5c/q5jaRhvB_t.png",
+            "https://thumbs2.imgbox.com/10/84/mSBhERn6_t.png",
+            "https://thumbs2.imgbox.com/c9/31/J9BVB1nd_t.jpg",
+            "https://thumbs2.imgbox.com/e5/2b/5bGhZjsa_t.png",
+            "https://thumbs2.imgbox.com/9b/c0/VB9ilgOq_t.png",
+            "https://thumbs2.imgbox.com/a3/85/jvkMljcW_t.jpg",
+            "https://thumbs2.imgbox.com/c7/cc/eFfrHpfz_t.png",
+            "https://thumbs2.imgbox.com/72/eb/pDEcSSBb_t.png",
+            "https://thumbs2.imgbox.com/a4/29/Ab6IXmGz_t.png",
+            "https://thumbs2.imgbox.com/23/a8/iL5HKXXV_t.png",
+            "https://thumbs2.imgbox.com/b6/b9/fsaf285O_t.png",
+            "https://thumbs2.imgbox.com/37/a1/X9mnlbiX_t.png",
+            "https://thumbs2.imgbox.com/6d/c7/zdZSugi8_t.png",
+            "https://thumbs2.imgbox.com/3d/14/lAeGHdJt_t.jpg",
+            "https://thumbs2.imgbox.com/e2/67/m2SBDPdF_t.png",
+            "https://thumbs2.imgbox.com/22/d5/CxOMCeed_t.png",
+            "https://thumbs2.imgbox.com/a0/17/JVEZAd6w_t.png",
+            "https://thumbs2.imgbox.com/21/5e/eVW2ktge_t.png",
+            "https://thumbs2.imgbox.com/3b/c9/3axzJI6d_t.png",
+            "https://thumbs2.imgbox.com/6e/04/n7ftpLl8_t.png",
+            "https://thumbs2.imgbox.com/ce/dc/UGgsBi2z_t.png",
+            "https://thumbs2.imgbox.com/14/0e/LpyqQFw5_t.png"
+        ];
+        
+        let currentIndex = 0;
+        let isImmersive = false;
+        let touchStartX = 0;
+
+        function toArabicDigits(num) {
+            const id = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return num.toString().replace(/[0-9]/g, w => id[+w]);
+        }
+
+        function init() {
+            const viewport = document.getElementById('viewport');
+            const thumbNav = document.getElementById('thumb-nav');
+
+            imageSources.forEach((src, index) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${index === currentIndex ? 'active' : ''}`;
+                const img = document.createElement('img');
+                img.src = src;
+                slide.appendChild(img);
+                viewport.appendChild(slide);
+
+                const thumb = document.createElement('img');
+                thumb.src = src;
+                thumb.className = `thumbnail ${index === currentIndex ? 'active' : ''}`;
+                thumb.onclick = () => goToSlide(index);
+                thumbNav.appendChild(thumb);
+            });
+            updateUI();
+        }
+
+        function changeSlide(dir) {
+            let next = (currentIndex + dir + imageSources.length) % imageSources.length;
+            goToSlide(next);
+        }
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const thumbs = document.querySelectorAll('.thumbnail');
+            
+            slides[currentIndex].classList.remove('active');
+            thumbs[currentIndex].classList.remove('active');
+            
+            currentIndex = index;
+            
+            slides[currentIndex].classList.add('active');
+            thumbs[currentIndex].classList.add('active');
+            
+            thumbs[currentIndex].scrollIntoView({ behavior: 'smooth', inline: 'center' });
+            updateUI();
+        }
+
+        function updateUI() {
+            const cur = toArabicDigits(String(currentIndex + 1).padStart(2, '0'));
+            const tot = toArabicDigits(String(imageSources.length).padStart(2, '0'));
+            document.getElementById('counter').innerText = `${cur} / ${tot}`;
+            document.getElementById('progress').style.width = ((currentIndex + 1) / imageSources.length) * 100 + '%';
+        }
+
+        function toggleImmersive() {
+            isImmersive = !isImmersive;
+            document.getElementById('main-app').classList.toggle('is-immersive', isImmersive);
+            document.getElementById('fs-btn').innerText = isImmersive ? "تصغير" : "ملء الشاشة";
+        }
+
+        // Gestures
+        document.getElementById('viewport').addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.getElementById('viewport').addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+        });
+
+        init();
+    </script>
+</body>
+</html>
