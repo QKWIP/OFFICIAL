@@ -119,6 +119,8 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 2.5rem;
             transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            text-decoration: none;
+            display: block;
         }
         .juz-card:hover {
             transform: translateY(-12px) scale(1.03);
@@ -201,15 +203,16 @@
     <section id="parts" class="py-24">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-black mb-20 text-center quran-font" data-aos="fade-down">فهرس الأجزاء</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-10">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-10">
                 <script>
                     const arabicWords = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس", "السابع", "الثامن", "التاسع", "العاشر", "الحادي عشر", "الثاني عشر", "الثالث عشر", "الرابع عشر", "الخامس عشر", "السادس عشر", "السابع عشر", "الثامن عشر", "التاسع عشر", "العشرون", "الحادي والعشرون", "الثاني والعشرون", "الثالث والعشرون", "الرابع والعشرون", "الخامس والعشرون", "السادس والعشرون", "السابع والعشرون", "الثامن والعشرون", "التاسع والعشرون", "الثلاثون"];
                     for (let i = 0; i < 30; i++) {
+                        const partNum = i + 1;
                         document.write(`
-                            <div class="juz-card p-12 text-center cursor-pointer group" data-aos="fade-up" data-aos-delay="${(i%5)*30}">
-                                <div class="text-amber-500/10 text-5xl mb-4 font-black transition-all group-hover:text-amber-500/40">${i+1}</div>
-                                <span class="text-xl font-bold quran-font opacity-40 group-hover:opacity-100 transition-all">الجزء ${arabicWords[i]}</span>
-                            </div>
+                            <a href="${partNum}.html" class="juz-card p-12 text-center cursor-pointer group" data-aos="fade-up" data-aos-delay="${(i%6)*30}">
+                                <div class="text-amber-500/10 text-5xl mb-4 font-black transition-all group-hover:text-amber-500/40">${partNum}</div>
+                                <span class="text-xl font-bold quran-font opacity-40 group-hover:opacity-100 transition-all text-white">الجزء ${arabicWords[i]}</span>
+                            </a>
                         `);
                     }
                 </script>
