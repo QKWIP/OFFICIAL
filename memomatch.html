@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لعبة الذاكرة - مستويات القرآن الكريم</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --accent-color: #00f2fe;
+            --transition-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+            --radius-card: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SF Pro Display', -apple-system, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #050505;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* الخلفية المحدثة */
+        .animated-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: url('https://png.pngtree.com/thumb_back/fw800/background/20231029/pngtree-blurred-bokeh-backdrop-unfocused-abstract-art-gallery-or-art-center-texture-image_13737569.png');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.4) saturate(1.2);
+            transition: transform 10s linear;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            z-index: 10;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .stat-item span {
+            color: var(--accent-color);
+            margin-right: 3px;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 5px;
+            background: rgba(0,0,0,0.3);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .diff-btn {
+            background: transparent;
+            border: none;
+            color: #aaa;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .diff-btn.active {
+            background: var(--accent-color);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .game-grid {
+            display: grid;
+            gap: 8px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .card {
+            aspect-ratio: 1/1;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s var(--transition-fluid);
+            cursor: pointer;
+        }
+
+        .card.flipped { transform: rotateY(180deg); }
+
+        .card.matched {
+            opacity: 0;
+            transform: rotateY(180deg) scale(0.8);
+            pointer-events: none;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .card-face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: var(--radius-card);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            box-shadow: inset 0 0 15px rgba(255,255,255,0.05);
+        }
+
+        .card-back::after {
+            content: "؟";
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            opacity: 0.5;
+        }
+
+        .card-front {
+            background: #fff;
+            transform: rotateY(180deg);
+        }
+
+        .card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 5px;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(15px);
+        }
+
+        .overlay.active { display: flex; }
+        
+        .win-card {
+            background: var(--glass-bg);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .btn-main {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* تحسين استجابة الشبكة */
+        @media (max-width: 480px) {
+            .game-grid { gap: 5px; }
+            .header { padding: 10px; flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="animated-bg" id="bg"></div>
+
+    <div class="header">
+        <div class="stats">
+            <div class="stat-item">المستوى: <span id="lvl-display">١</span></div>
+            <div class="stat-item">المحاولات: <span id="moves">٠</span></div>
+        </div>
+
+        <div class="difficulty-selector">
+            <button class="diff-btn active" onclick="setDiff('auto')" id="d-auto">تلقائي</button>
+            <button class="diff-btn" onclick="setDiff('easy')" id="d-easy">سهل</button>
+            <button class="diff-btn" onclick="setDiff('medium')" id="d-medium">متوسط</button>
+            <button class="diff-btn" onclick="setDiff('hard')" id="d-hard">صعب</button>
+        </div>
+    </div>
+
+    <div class="game-grid" id="grid"></div>
+
+    <div class="overlay" id="next-overlay">
+        <div class="win-card">
+            <h2 id="win-title" style="font-size: 2rem; color: var(--accent-color); margin-bottom: 10px;">رائع!</h2>
+            <p id="win-msg" style="margin-bottom: 20px;">تم اجتياز المستوى بنجاح.</p>
+            <button class="btn-main" id="next-btn" onclick="advanceLevel()">المستوى التالي</button>
+        </div>
+    </div>
+
+    <script>
+        // جميع الروابط الأربعين التي زودتني بها
+        const allImages = [
+            "https://thumbs2.imgbox.com/cb/9f/jXT4nxc6_t.png", "https://thumbs2.imgbox.com/49/20/mhxLw85a_t.png",
+            "https://thumbs2.imgbox.com/1a/ad/77Gwmz7h_t.png", "https://thumbs2.imgbox.com/7a/d3/0QuGgJyD_t.png",
+            "https://thumbs2.imgbox.com/be/05/nW7z2wEz_t.png", "https://thumbs2.imgbox.com/45/aa/D2VgPyJU_t.png",
+            "https://thumbs2.imgbox.com/3b/58/d57GSYEj_t.png", "https://thumbs2.imgbox.com/2f/de/rfvHKoa5_t.png",
+            "https://thumbs2.imgbox.com/12/7e/OE8r07l7_t.png", "https://thumbs2.imgbox.com/35/0f/bKrFcQ9g_t.png",
+            "https://thumbs2.imgbox.com/b5/fc/THwdP1Ux_t.png", "https://thumbs2.imgbox.com/ef/32/nZfRqU8a_t.png",
+            "https://thumbs2.imgbox.com/3b/08/p03ym5TY_t.png", "https://thumbs2.imgbox.com/13/05/yDh3R8Fs_t.png",
+            "https://thumbs2.imgbox.com/25/48/FquU0VdE_t.png", "https://thumbs2.imgbox.com/a4/03/i891m9EY_t.png",
+            "https://thumbs2.imgbox.com/50/63/pZTU8B6g_t.png", "https://thumbs2.imgbox.com/92/25/V6TjNa8a_t.png",
+            "https://thumbs2.imgbox.com/94/2c/iNKiUJ4a_t.png", "https://thumbs2.imgbox.com/0e/0b/2Bmj1svS_t.png",
+            "https://thumbs2.imgbox.com/eb/23/4l9xoNLQ_t.png", "https://thumbs2.imgbox.com/6a/31/d31ld3UD_t.png",
+            "https://thumbs2.imgbox.com/2f/0b/33SaKX8v_t.png", "https://thumbs2.imgbox.com/17/03/xq9TCO8C_t.png",
+            "https://thumbs2.imgbox.com/57/2a/wzspieVx_t.png", "https://thumbs2.imgbox.com/7c/d8/p05A0wha_t.png",
+            "https://thumbs2.imgbox.com/8f/05/iHORxAQF_t.png", "https://thumbs2.imgbox.com/61/7b/YRtdaQ1W_t.png",
+            "https://thumbs2.imgbox.com/68/82/UNujljay_t.png", "https://thumbs2.imgbox.com/7d/c9/MFVFtqgC_t.png",
+            "https://thumbs2.imgbox.com/cd/23/Ces8hKlO_t.png", "https://thumbs2.imgbox.com/cd/07/8N1szJw0_t.png",
+            "https://thumbs2.imgbox.com/8e/ce/Xs6wVI9t_t.png", "https://thumbs2.imgbox.com/22/23/aOISa1ht_t.png",
+            "https://thumbs2.imgbox.com/f6/b3/16dYpbg3_t.png", "https://thumbs2.imgbox.com/40/e8/8jxS2gdW_t.png",
+            "https://thumbs2.imgbox.com/b9/df/pIEPaCxY_t.png", "https://thumbs2.imgbox.com/8d/e7/li0vTnL5_t.png",
+            "https://thumbs2.imgbox.com/a1/19/nHtA7LwW_t.png", "https://thumbs2.imgbox.com/83/8e/omVh9E6s_t.png"
+        ];
+
+        let currentLevel = 1;
+        let difficulty = 'auto'; // 'auto', 'easy', 'medium', 'hard'
+        let gridConfig = { rows: 2, cols: 3 }; 
+        let flippedCards = [];
+        let moves = 0;
+        let matchesCount = 0;
+        let canFlip = true;
+
+        function toArabicDigits(num) {
+            const id = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return num.toString().replace(/[0-9]/g, w => id[+w]);
+        }
+
+        function setDiff(mode) {
+            difficulty = mode;
+            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('d-' + mode).classList.add('active');
+            
+            if (mode !== 'auto') {
+                currentLevel = 1; // ريستارت لو غير الصعوبة يدوي
+            }
+            setupLevel();
+        }
+
+        function setupLevel() {
+            if (difficulty === 'auto') {
+                // تدرج الصعوبة التلقائي
+                if (currentLevel === 1) gridConfig = { rows: 2, cols: 3 };
+                else if (currentLevel === 2) gridConfig = { rows: 3, cols: 4 };
+                else if (currentLevel === 3) gridConfig = { rows: 4, cols: 4 };
+                else if (currentLevel === 4) gridConfig = { rows: 4, cols: 5 };
+                else gridConfig = { rows: 5, cols: 6 };
+            } else {
+                if (difficulty === 'easy') gridConfig = { rows: 2, cols: 4 };
+                if (difficulty === 'medium') gridConfig = { rows: 4, cols: 4 };
+                if (difficulty === 'hard') gridConfig = { rows: 5, cols: 8 };
+            }
+
+            document.getElementById('lvl-display').innerText = toArabicDigits(currentLevel);
+            initGame();
+        }
+
+        function initGame() {
+            moves = 0;
+            matchesCount = 0;
+            flippedCards = [];
+            canFlip = true;
+            document.getElementById('moves').innerText = '٠';
+            document.getElementById('next-overlay').classList.remove('active');
+            
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            // حساب عدد الأزواج المطلوبة
+            const totalCards = gridConfig.rows * gridConfig.cols;
+            const pairsCount = Math.floor(totalCards / 2);
+
+            // اختيار صور عشوائية من القائمة
+            const shuffledPool = [...allImages].sort(() => Math.random() - 0.5);
+            const selectedImages = shuffledPool.slice(0, pairsCount);
+            
+            // مضاعفة وخلط البطاقات النهائية
+            const gameCards = [...selectedImages, ...selectedImages].sort(() => Math.random() - 0.5);
+
+            // تحديث تصميم الشبكة
+            grid.style.gridTemplateColumns = `repeat(${gridConfig.cols}, 1fr)`;
+
+            gameCards.forEach((img, i) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.img = img;
+                card.innerHTML = `
+                    <div class="card-face card-back"></div>
+                    <div class="card-face card-front"><img src="${img}"></div>
+                `;
+                card.onclick = () => flip(card);
+                grid.appendChild(card);
+            });
+        }
+
+        function flip(card) {
+            if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').innerText = toArabicDigits(moves);
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            canFlip = false;
+            const [c1, c2] = flippedCards;
+            const isMatch = c1.dataset.img === c2.dataset.img;
+
+            if (isMatch) {
+                setTimeout(() => {
+                    c1.classList.add('matched');
+                    c2.classList.add('matched');
+                    matchesCount++;
+                    flippedCards = [];
+                    canFlip = true;
+                    if (matchesCount === Math.floor((gridConfig.rows * gridConfig.cols) / 2)) {
+                        showNextLevel();
+                    }
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    c1.classList.remove('flipped');
+                    c2.classList.remove('flipped');
+                    flippedCards = [];
+                    canFlip = true;
+                }, 1000);
+            }
+        }
+
+        function showNextLevel() {
+            const overlay = document.getElementById('next-overlay');
+            const title = document.getElementById('win-title');
+            const btn = document.getElementById('next-btn');
+
+            if (difficulty === 'auto' && currentLevel < 5) {
+                title.innerText = "أحسنت!";
+                btn.innerText = "المستوى التالي";
+            } else if (difficulty !== 'auto') {
+                title.innerText = "مبروك!";
+                btn.innerText = "العب مرة أخرى";
+            } else {
+                title.innerText = "بطل الذاكرة!";
+                btn.innerText = "العودة للمستوى الأول";
+            }
+            overlay.classList.add('active');
+        }
+
+        function advanceLevel() {
+            if (difficulty === 'auto') {
+                currentLevel = (currentLevel % 5) + 1;
+            }
+            setupLevel();
+        }
+
+        // تأثير تحريك الخلفية البسيط
+        let moveX = 0;
+        setInterval(() => {
+            moveX += 0.05;
+            document.getElementById('bg').style.transform = `scale(1.1) translateX(${Math.sin(moveX) * 20}px)`;
+        }, 50);
+
+        window.onload = setupLevel;
+    </script>
+</body>
+</html>
