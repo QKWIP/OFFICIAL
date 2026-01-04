@@ -3,33 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QKWIP</title>
+    <title>QKWIP - الإصدار النهائي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <link rel="icon" type="image/png" href="https://png.pngtree.com/png-clipart/20220213/original/pngtree-al-quran-kareem-calligraphy-golden-islamic-clipart-png-image_7270566.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Kufi+Arabic:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Kufi+Arabic:wght@100..900&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --accent-gold: #e5c05e;
-            --bg-deep: #050a0c;
+            --bg-deep: #05070a;
+            --ios-blur: 40px;
+            --ios-opacity: 0.1;
+            --glass-border: rgba(255, 255, 255, 0.1);
             --text-color: #ffffff;
-            --glass: rgba(255, 255, 255, 0.03);
-            --menu-bg: rgba(10, 15, 20, 0.9);
-            --blob-opacity: 0.5;
+            --glass-bg: rgba(255, 255, 255, var(--ios-opacity));
+            --spring-ease: cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @media (prefers-color-scheme: light) {
-            :root {
-                --accent-gold: #b48a2e;
-                --bg-deep: #f0f4f8;
-                --text-color: #0f172a;
-                --glass: rgba(0, 0, 0, 0.04);
-                --menu-bg: rgba(255, 255, 255, 0.9);
-                --blob-opacity: 0.25;
-            }
+        body.light-mode {
+            --bg-deep: #f5f5f7;
+            --text-color: #1d1d1f;
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --glass-bg: rgba(0, 0, 0, var(--ios-opacity));
         }
 
         ::-webkit-scrollbar { display: none; }
@@ -42,259 +41,500 @@
             user-select: none;
             overflow-x: hidden;
             margin: 0;
-            min-height: 100vh;
+            transition: background 0.8s ease;
         }
 
-        /* Fast & Smooth Animated Background */
-        .animated-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: linear-gradient(125deg, var(--bg-deep), #0d2a35, #081a21, var(--bg-deep));
-            background-size: 300% 300%;
-            animation: meshGradient 10s linear infinite; /* Faster and Linear */
+        .bg-mesh {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
+            background: var(--bg-deep); transition: background 0.8s ease;
+            overflow: hidden;
+        }
+        .mesh-circle {
+            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.25;
+            transition: all 1.2s cubic-bezier(0.2, 0, 0.2, 1);
+            pointer-events: none;
         }
 
-        @keyframes meshGradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .blob {
-            position: absolute;
-            width: 70vw;
-            height: 70vw;
-            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 65%);
-            filter: blur(100px);
-            opacity: var(--blob-opacity);
-            z-index: -1;
-            animation: moveBlobs 12s infinite linear alternate; /* Faster motion */
-        }
-
-        @keyframes moveBlobs {
-            0% { transform: translate(-15%, -15%) rotate(0deg) scale(1); }
-            100% { transform: translate(25%, 25%) rotate(90deg) scale(1.3); }
+        .glass-core {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(var(--ios-blur)) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(var(--ios-blur)) saturate(180%) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease, backdrop-filter 0.3s ease, border-radius 0.4s var(--spring-ease), height 0.4s var(--spring-ease);
         }
 
         .bubble-header {
-            position: fixed;
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1100px;
-            background: var(--glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed; top: 25px; left: 50%; transform: translateX(-50%);
+            width: 95%; max-width: 1000px; 
             border-radius: 100px;
-            z-index: 1000;
-            padding: 10px 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 10000;
+            padding: 8px 12px; 
+            display: flex; flex-direction: column;
+            transition: all 0.5s var(--spring-ease);
+            overflow: hidden;
+        }
+        
+        .bubble-header.expanded {
+            border-radius: 35px;
         }
 
+        .header-top-row {
+            width: 100%; display: flex; align-items: center; justify-content: space-between;
+            z-index: 2;
+        }
+
+        .header-content-area {
+            width: 100%;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s var(--spring-ease), opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .header-content-area.open {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .header-scrolled { top: 15px; width: 90%; transform: translateX(-50%) scale(0.98); }
+
+        .nav-links { display: flex; align-items: center; gap: 4px; }
         .nav-item {
-            font-size: 11px;
-            font-weight: 900;
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0.5;
+            padding: 10px 15px; border-radius: 100px; font-size: 11px; font-weight: 800;
+            opacity: 0.5; transition: 0.3s; cursor: pointer;
         }
-        .nav-item:hover { opacity: 1; color: var(--accent-gold); transform: scale(1.1); }
+        .nav-item:hover { opacity: 1; background: rgba(120, 120, 120, 0.1); }
 
-        .gold-button {
-            background: linear-gradient(45deg, #d4af37, #fcf6ba, #aa771c);
-            background-size: 200% 200%;
-            color: #081115;
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .icon-btn {
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; cursor: pointer; transition: all 0.4s var(--spring-ease);
         }
-        .gold-button:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4); }
+        .icon-btn:hover { background: rgba(120, 120, 120, 0.15); transform: scale(1.1); }
 
-        .quran-font { font-family: 'Amiri', serif; }
-
-        .juz-card {
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 2.5rem;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            text-decoration: none;
-            display: block;
-        }
-        .juz-card:hover {
-            transform: translateY(-12px) scale(1.03);
-            background: rgba(229, 192, 94, 0.12);
-            border-color: var(--accent-gold);
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+        .search-wrapper { position: relative; flex-grow: 1; max-width: 250px; margin: 0 10px; }
+        .search-input {
+            width: 100%; background: rgba(120, 120, 120, 0.1); border: 1px solid transparent; 
+            border-radius: 100px; padding: 10px 35px 10px 15px; font-size: 12px;
+            color: var(--text-color); outline: none; transition: 0.3s;
         }
 
-        .info-section {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 40px;
-            padding: 50px;
-            backdrop-filter: blur(10px);
-        }
-
-        #security-hint {
-            position: fixed;
-            padding: 12px 24px;
-            background: var(--accent-gold);
-            color: #000;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 800;
-            pointer-events: none;
-            z-index: 2000;
+        #search-results {
+            width: 100%;
             display: none;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            transform: translate(-50%, -130%);
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px;
+            padding-bottom: 10px;
         }
+        #search-results.active { display: grid; }
+        
+        .result-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s var(--spring-ease);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .result-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(0.98);
+        }
+        .result-item.last-odd { grid-column: span 2; }
+
+        #settings-panel { width: 100%; display: none; }
+        #settings-panel.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #copyright-popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); z-index: 999999;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px; color: white;
+        }
+
+        .hero-title { 
+            font-size: clamp(2rem, 8vw, 6rem); 
+            font-weight: 900; line-height: 1.1; letter-spacing: -2px;
+            background: linear-gradient(to bottom, var(--text-color) 40%, rgba(120,120,120,0.2) 100%); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .slider-custom { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(120, 120, 120, 0.2); border-radius: 10px; }
+        .slider-custom::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--text-color); border-radius: 50%; cursor: pointer; border: 2px solid var(--bg-deep); }
+
+        .select-custom {
+            background: rgba(120, 120, 120, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-color);
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #part-pill { cursor: pointer; transition: all 0.5s var(--spring-ease); }
+        #part-pill:hover { transform: scale(1.1); background: var(--accent-gold); color: white; }
+
+        .social-card {
+            transition: 0.4s var(--spring-ease);
+            background: rgba(120,120,120,0.05);
+            border: 1px solid rgba(120,120,120,0.1);
+        }
+        .social-card:hover { transform: translateY(-8px); background: rgba(120,120,120,0.1); border-color: white; }
     </style>
 </head>
-<body oncontextmenu="handleSecurity(event); return false;" onselectstart="handleSecurity(event); return false;">
+<body onmousemove="handleMouseMove(event)" oncontextmenu="showErrorPopup(event)">
 
-    <div id="security-hint">المحتوى محمي وحقوق الطبع محفوظة</div>
-
-    <div class="animated-bg"></div>
-    <div class="blob" style="top: -15%; left: -10%;"></div>
-    <div class="blob" style="bottom: -15%; right: -10%; animation-delay: -3s;"></div>
-
-    <!-- Header -->
-    <header class="bubble-header">
-        <div class="flex justify-between items-center">
-            <div onclick="scrollToSection('home')" class="flex items-center gap-3 cursor-pointer group">
-                <span class="w-10 h-10 gold-button rounded-full flex items-center justify-center text-sm font-black shadow-lg">Q</span>
-                <span class="font-black text-xl tracking-tighter">QKWIP</span>
+    <!-- نافذة الخطأ المعربة -->
+    <div id="copyright-popup" onclick="hideErrorPopup()">
+        <div class="max-w-md" data-aos="zoom-in">
+            <div class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse shadow-[0_0_50px_rgba(220,38,38,0.5)]">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             </div>
-            
-            <nav class="flex items-center gap-6 md:gap-12">
+            <h2 class="text-3xl font-black mb-4 tracking-tighter">انتهاك سياسة المحتوى</h2>
+            <p class="text-sm opacity-70 leading-relaxed font-bold mb-6">
+                نعتذر، لا يمكن إتمام هذه العملية. المحتوى محمي بموجب حقوق الطبع والنشر الخاصة بمشروع QKWIP. يرجى احترام الخصوصية الفنية.
+            </p>
+            <div class="inline-block px-6 py-2 border border-white/20 rounded-full text-[10px] opacity-40 uppercase tracking-[0.3em]">انقر في أي مكان للإغلاق</div>
+        </div>
+    </div>
+
+    <div class="bg-mesh" id="mesh-container">
+        <div id="blob1" class="mesh-circle w-[90vw] h-[90vw] top-[-20%] right-[-10%]" style="background: radial-gradient(circle, #e5c05e 0%, transparent 70%);"></div>
+        <div id="blob2" class="mesh-circle w-[70vw] h-[70vw] bottom-[-20%] left-[-10%]" style="background: radial-gradient(circle, #3b82f6 0%, transparent 70%);"></div>
+        <div id="blob3" class="mesh-circle w-[50vw] h-[50vw] top-[30%] left-[20%]" style="background: radial-gradient(circle, #a855f7 0%, transparent 70%);"></div>
+    </div>
+
+    <header class="bubble-header glass-core" id="main-header">
+        <div class="header-top-row">
+            <div class="flex items-center">
+                <div onclick="toggleSettings(event)" class="icon-btn" title="الإعدادات">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                </div>
+                
+                <div class="search-wrapper">
+                    <input type="text" id="main-search" placeholder="بحث..." class="search-input" oninput="runSearch(this.value)">
+                    <svg class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+
+            <nav class="nav-links hidden sm:flex">
                 <span onclick="scrollToSection('home')" class="nav-item">الرئيسية</span>
                 <span onclick="scrollToSection('parts')" class="nav-item">الأجزاء</span>
-                <span onclick="scrollToSection('legal')" class="nav-item">الخصوصية</span>
-                <span onclick="scrollToSection('legal')" class="nav-item">شروط الإستخدام</span>
-                <span onclick="scrollToSection('social')" class="nav-item">تواصل</span>
+                <span onclick="scrollToSection('policies')" class="nav-item">السياسات</span>
+                <span onclick="scrollToSection('contact')" class="nav-item">تواصل</span>
             </nav>
 
-            <div class="hidden md:block">
-                <span class="text-[9px] opacity-20 font-bold uppercase tracking-[0.3em]"></span>
+            <div id="part-pill" onclick="goToCurrentPart()" class="px-5 py-1.5 bg-white text-black rounded-full font-black text-[12px] shadow-xl min-w-[45px] text-center">1</div>
+        </div>
+
+        <div id="header-expansion-area" class="header-content-area">
+            
+            <div id="settings-panel">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-[10px] font-black opacity-30 tracking-widest uppercase">Visual Engine</span>
+                    <button onclick="closeExpansion()" class="opacity-30 hover:opacity-100 transition">✕</button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="p-3 rounded-2xl bg-white/5 flex flex-col gap-2">
+                        <span class="text-[9px] font-bold opacity-50 uppercase">قالب الخلفية</span>
+                        <select id="bg-template" class="select-custom" onchange="updateBackgroundTemplate(this.value)">
+                            <option value="default">QKWIP Mesh</option>
+                            <option value="aurora">Aurora Borealis</option>
+                            <option value="ocean">Deep Ocean</option>
+                            <option value="sunset">Golden Sunset</option>
+                        </select>
+                    </div>
+                    <div class="p-3 rounded-2xl bg-white/5 flex items-center justify-between">
+                        <span class="text-xs font-bold">الوضع الليلي</span>
+                        <div id="dark-toggle" class="toggle-btn on" onclick="toggleDark()"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <div class="flex justify-between text-[9px] mb-2 opacity-50 font-black"><span>التمويه (BLUR)</span><span id="blur-txt">40px</span></div>
+                        <input type="range" min="0" max="80" value="40" class="slider-custom" oninput="updateVisuals('blur', this.value)">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[9px] mb-2 opacity-50 font-black"><span>الشفافية (OPACITY)</span><span id="opacity-txt">10%</span></div>
+                        <input type="range" min="2" max="50" value="10" class="slider-custom" oninput="updateVisuals('opacity', this.value)">
+                    </div>
+                </div>
+
+                <button onclick="saveConfig()" class="w-full mt-8 py-3 bg-white text-black rounded-2xl font-black text-[10px] uppercase hover:scale-[1.01] active:scale-95 transition-all shadow-lg">حفظ التفضيلات</button>
             </div>
+
+            <div id="search-results"></div>
         </div>
     </header>
 
-    <!-- Hero -->
-    <section id="home" class="min-h-screen flex items-center justify-center pt-20">
-        <div class="container mx-auto px-6 text-center">
-            <h1 class="text-6xl md:text-[8rem] font-bold mb-6 leading-[1.1] quran-font" data-aos="zoom-out">
-                القرآن الكريم <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200">كلمة في صورة</span>
-            </h1>
-            <p class="text-lg md:text-2xl max-w-2xl mx-auto opacity-40 mb-12 font-light" data-aos="fade-up" data-aos-delay="200">
-                مشروع دعوي يدمج جماليات الفن الرقمي بقدسية الآيات القرآنية لتعزيز التدبر البصري.
-            </p>
-            <div data-aos="fade-up" data-aos-delay="400">
-                <button onclick="scrollToSection('parts')" class="gold-button px-14 py-5 rounded-full text-lg font-black shadow-2xl">تصفح المصحف</button>
+    <!-- باقي المحتوى (الرئيسية، الأجزاء، إلخ) يبقى كما هو -->
+    <section id="home" class="min-h-screen flex flex-col items-center justify-center px-6 text-center">
+        <div data-aos="zoom-out">
+            <h1 class="hero-title quran-font mb-6">القرآن الكريم <br> كلمة في صورة</h1>
+            <p class="text-base opacity-40 font-light max-w-lg mx-auto mb-10">استكشف معاني الآيات من خلال عدسة فنية عالمية.</p>
+            <button onclick="scrollToSection('parts')" class="px-10 py-4 bg-white text-black rounded-full font-black text-sm shadow-2xl hover:scale-105 active:scale-95 transition-all">ابدأ الآن</button>
+        </div>
+    </section>
+
+    <section id="parts" class="py-32 max-w-7xl mx-auto px-6">
+        <div class="flex justify-between items-end mb-16" data-aos="fade-up">
+            <h2 class="text-4xl font-black quran-font">الأجزاء</h2>
+            <div class="text-[10px] opacity-20 font-black uppercase tracking-[0.5em]">Explore the 30 Parts</div>
+        </div>
+        <div id="grid-parts" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
+    </section>
+
+    <section id="policies" class="py-20 px-6 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-core p-12 rounded-[50px]" data-aos="fade-right">
+                <h3 class="text-2xl font-black mb-6">الخصوصية</h3>
+                <p class="text-sm opacity-40 leading-loose">بياناتك وتفضيلاتك هي ملكك وحدك، نحن نستخدم التخزين المحلي لمتصفحك فقط ولا يتم نقل أي معلومات لخوادم خارجية.</p>
+            </div>
+            <div class="glass-core p-12 rounded-[50px]" data-aos="fade-left">
+                <h3 class="text-2xl font-black mb-6">شروط الاستخدام</h3>
+                <p class="text-sm opacity-40 leading-loose">جميع الأعمال البصرية محمية بموجب حقوق الملكية الفكرية لمشروع QKWIP، ويمنع استخدامها تجارياً دون إذن مسبق.</p>
             </div>
         </div>
     </section>
 
-    <!-- Parts Grid -->
-    <section id="parts" class="py-24">
-        <div class="container mx-auto px-6">
-            <h2 class="text-4xl font-black mb-20 text-center quran-font" data-aos="fade-down">فهرس الأجزاء</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-10">
-                <script>
-                    const arabicWords = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس", "السابع", "الثامن", "التاسع", "العاشر", "الحادي عشر", "الثاني عشر", "الثالث عشر", "الرابع عشر", "الخامس عشر", "السادس عشر", "السابع عشر", "الثامن عشر", "التاسع عشر", "العشرون", "الحادي والعشرون", "الثاني والعشرون", "الثالث والعشرون", "الرابع والعشرون", "الخامس والعشرون", "السادس والعشرون", "السابع والعشرون", "الثامن والعشرون", "التاسع والعشرون", "الثلاثون"];
-                    for (let i = 0; i < 30; i++) {
-                        const partNum = i + 1;
-                        document.write(`
-                            <a href="${partNum}.html" class="juz-card p-12 text-center cursor-pointer group" data-aos="fade-up" data-aos-delay="${(i%6)*30}">
-                                <div class="text-amber-500/10 text-5xl mb-4 font-black transition-all group-hover:text-amber-500/40">${partNum}</div>
-                                <span class="text-xl font-bold quran-font opacity-40 group-hover:opacity-100 transition-all text-white">الجزء ${arabicWords[i]}</span>
-                            </a>
-                        `);
-                    }
-                </script>
-            </div>
+    <section id="contact" class="py-32 px-6 max-w-5xl mx-auto" data-aos="fade-up">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-black mb-4">تواصل مع المشروع</h2>
+            <p class="opacity-30">تابعنا على المنصات الرسمية لمزيد من التحديثات اليومية</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- الروابط الاجتماعية -->
+            <a href="https://facebook.com/QuranKareemWordInPicture/" target="_blank" class="social-card p-8 rounded-[40px] text-center">
+                <div class="mb-4 flex justify-center text-blue-500"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></div>
+                <span class="text-[9px] font-black uppercase tracking-widest">Facebook</span>
+            </a>
+            <a href="https://youtube.com/@qkwip-official" target="_blank" class="social-card p-8 rounded-[40px] text-center">
+                <div class="mb-4 flex justify-center text-red-500"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></div>
+                <span class="text-[9px] font-black uppercase tracking-widest">YouTube</span>
+            </a>
+            <a href="https://t.me/QKWIP" target="_blank" class="social-card p-8 rounded-[40px] text-center">
+                <div class="mb-4 flex justify-center text-sky-400"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0C5.346 0 0 5.346 0 11.944s5.346 11.944 11.944 11.944 11.944-5.346 11.944-11.944S18.542 0 11.944 0zm5.823 8.35c-.172 1.815-.92 6.22-1.302 8.262-.162.863-.48 1.153-.787 1.181-.676.062-1.187-.446-1.842-.876-1.026-.673-1.606-1.092-2.603-1.748-1.152-.76-.405-1.176.252-1.857.171-.178 3.14-2.876 3.197-3.123.007-.03-.002-.142-.068-.2-.066-.059-.163-.039-.233-.024-.1.021-1.69 1.074-4.767 3.15-.451.31-.859.462-1.223.453-.402-.01-.1.176-.7.31-.913.31-.98-.673-1.46-.827-.588-.19-1.054-.29-.1.176-.462-.257-.1.312.443.642.443 1.144.123 1.812.123.005.003.01.005.015.008l.008.005z"/></svg></div>
+                <span class="text-[9px] font-black uppercase tracking-widest">Telegram</span>
+            </a>
+            <a href="mailto:quran.kareem.word.in.picture@gmail.com" class="social-card p-8 rounded-[40px] text-center">
+                <div class="mb-4 flex justify-center text-amber-500"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                <span class="text-[9px] font-black uppercase tracking-widest">Email</span>
+            </a>
         </div>
     </section>
 
-    <!-- Legal Section (Terms & Privacy) -->
-    <section id="legal" class="py-24">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-10">
-                <!-- Terms -->
-                <div class="info-section" data-aos="fade-left">
-                    <h3 class="text-3xl font-black mb-6 text-amber-500 quran-font">شروط الاستخدام</h3>
-                    <div class="space-y-4 opacity-50 text-sm leading-relaxed">
-                        <p>١. جميع التصاميم الفنية في هذا الموقع هي ملكية فكرية لمشروع QKWIP ويُمنع نسبها لغير المصدر.</p>
-                        <p>٢. يُسمح بإعادة نشر المحتوى في القنوات الدعوية والمواقع غير الربحية مع الحفاظ على شعار المشروع.</p>
-                        <p>٣. يُحظر تماماً تعديل الصور أو قصها أو استخدامها في أغراض تجارية أو ترويجية خاصة دون إذن كتابي.</p>
-                        <p>٤. استخدامك للموقع يعني موافقتك على هذه الشروط كجزء من الميثاق الأخلاقي لنشر العلم النافع.</p>
-                    </div>
-                </div>
-                <!-- Privacy -->
-                <div class="info-section" data-aos="fade-right">
-                    <h3 class="text-3xl font-black mb-6 text-amber-500 quran-font">سياسة الخصوصية</h3>
-                    <div class="space-y-4 opacity-50 text-sm leading-relaxed">
-                        <p>• نحن لا نجمع أي بيانات تعريفية شخصية عن الزوار ولا نطلب تسجيل الدخول للوصول للأرشيف.</p>
-                        <p>• الموقع لا يستخدم ملفات تعريف ارتباط (Cookies) خارجية لتعقب سلوك المستخدم عبر الإنترنت.</p>
-                        <p>• الواجهة تتكيف تلقائياً مع إعدادات نظامك (داكن/فاتح) لضمان أفضل تجربة قراءة وحماية للعين.</p>
-                        <p>• أي مراسلات عبر البريد الإلكتروني الرسمي تظل سرية تماماً ولا تُشارك مع أي جهة ثالثة.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Social Section -->
-    <section id="social" class="py-24">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-3xl font-black mb-16 quran-font">القنوات الرسمية</h2>
-            <div class="flex flex-wrap justify-center gap-8" data-aos="zoom-in">
-                <a href="https://www.facebook.com/QuranKareemWordInPicture/" target="_blank" class="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center hover:scale-110 hover:border-blue-600 transition-all group">
-                    <svg class="w-8 h-8 fill-white/20 group-hover:fill-blue-600" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                </a>
-                <a href="https://youtube.com/@qkwip-official" target="_blank" class="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center hover:scale-110 hover:border-red-500 transition-all group">
-                    <svg class="w-8 h-8 fill-white/20 group-hover:fill-red-500" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                </a>
-                <a href="mailto:Quran.kareem.word..in.picture@gmail.com" class="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center hover:scale-110 hover:border-amber-400 transition-all group">
-                    <svg class="w-8 h-8 fill-white/20 group-hover:fill-amber-400" viewBox="0 0 24 24"><path d="M0 3v18h24v-18h-24zm21.518 2l-9.518 7.713-9.518-7.713h19.036zm-19.518 14v-11.817l10 8.104 10-8.104v11.817h-20z"/></svg>
-                </a>
-                <a href="https://t.me/QKWIP" target="_blank" class="w-20 h-20 bg-white/5 border border-white/10 rounded-3xl flex items-center justify-center hover:scale-110 hover: Sky-500 transition-all group">
-                    <svg class="w-8 h-8 fill-white/20 group-hover:fill-sky-500" viewBox="0 0 24 24"><path d="M11.944 0c-6.603 0-11.944 5.341-11.944 11.944 0 6.603 5.341 11.944 11.944 11.944 6.603 0 11.944-5.341 11.944-11.944 0-6.603-5.341-11.944-11.944-11.944zm5.812 8.326l-1.897 8.95c-.141.636-.519.791-1.051.491l-2.883-2.126-1.391 1.336c-.154.154-.284.284-.582.284l.206-2.924 5.323-4.809c.232-.206-.051-.321-.361-.115l-6.577 4.137-2.834-.886c-.616-.192-.628-.616.128-.911l11.082-4.271c.513-.186.961.121.758.918z"/></svg>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-16 text-center border-t border-white/5">
-        <p class="opacity-20 text-[11px] font-black tracking-[0.4em] uppercase">© ٢٠٢٦ مشروع QKWIP الرسمي • جميع الحقوق محفوظة</p>
+    <footer class="py-20 text-center opacity-10 text-[9px] font-black uppercase tracking-[1em]">
+        © 2026 QKWIP PROJECT. ALL RIGHTS RESERVED.
     </footer>
 
+    <div id="save-toast">تم التحديث بنجاح ✓</div>
+
     <script>
-        function handleSecurity(e) {
-            const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
-            const y = e.pageY || (e.touches ? e.touches[0].pageY : 0);
-            const hint = document.getElementById('security-hint');
-            hint.style.display = 'block';
-            hint.style.left = x + 'px'; hint.style.top = y + 'px';
-            setTimeout(() => hint.style.display = 'none', 1500);
+        const names = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس", "السابع", "الثامن", "التاسع", "العاشر", "الحادي عشر", "الثاني عشر", "الثالث عشر", "الرابع عشر", "الخامس عشر", "السادس عشر", "السابع عشر", "الثامن عشر", "التاسع عشر", "العشرون", "الحادي والعشرون", "الثاني والعشرون", "الثالث والعشرون", "الرابع والعشرون", "الخامس والعشرون", "السادس والعشرون", "السابع والعشرون", "الثامن والعشرون", "التاسع والعشرون", "الثلاثون"];
+        
+        let state = JSON.parse(localStorage.getItem('qkwip_vfinal')) || { dark: true, blur: 40, opacity: 0.1, template: 'default' };
+        let currentPillNumber = 1;
+
+        const templates = {
+            default: ['#e5c05e', '#3b82f6', '#a855f7'],
+            aurora: ['#10b981', '#3b82f6', '#6366f1'],
+            ocean: ['#0ea5e9', '#2563eb', '#1e40af'],
+            sunset: ['#f59e0b', '#ef4444', '#7c2d12']
+        };
+
+        function updateBackgroundTemplate(id) {
+            state.template = id;
+            const colors = templates[id];
+            document.getElementById('blob1').style.background = `radial-gradient(circle, ${colors[0]} 0%, transparent 70%)`;
+            document.getElementById('blob2').style.background = `radial-gradient(circle, ${colors[1]} 0%, transparent 70%)`;
+            document.getElementById('blob3').style.background = `radial-gradient(circle, ${colors[2]} 0%, transparent 70%)`;
+        }
+
+        function updateVisuals(type, val) {
+            if(type === 'blur') {
+                state.blur = val;
+                document.getElementById('blur-txt').textContent = val + 'px';
+            } else if(type === 'opacity') {
+                state.opacity = val / 100;
+                document.getElementById('opacity-txt').textContent = val + '%';
+            }
+            applyTheme();
+        }
+
+        function applyTheme() {
+            const r = document.documentElement;
+            r.style.setProperty('--ios-blur', state.blur + 'px');
+            r.style.setProperty('--ios-opacity', state.opacity);
+            const color = state.dark ? '255,255,255' : '0,0,0';
+            const bgVal = state.dark ? '#05070a' : '#f5f5f7';
+            r.style.setProperty('--bg-deep', bgVal);
+            r.style.setProperty('--glass-bg', `rgba(${color}, ${state.opacity})`);
+            if(state.dark) document.body.classList.remove('light-mode');
+            else document.body.classList.add('light-mode');
+            document.getElementById('dark-toggle').classList.toggle('on', state.dark);
+            updateBackgroundTemplate(state.template);
+        }
+
+        function toggleDark() {
+            state.dark = !state.dark;
+            applyTheme();
+        }
+
+        function saveConfig() {
+            localStorage.setItem('qkwip_vfinal', JSON.stringify(state));
+            const t = document.getElementById('save-toast');
+            t.style.opacity = '1'; t.style.bottom = '30px';
+            setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '-50px'; }, 2000);
+            closeExpansion();
+        }
+
+        function openExpansion(type) {
+            const expansionArea = document.getElementById('header-expansion-area');
+            const settingsPanel = document.getElementById('settings-panel');
+            const searchResults = document.getElementById('search-results');
+            const header = document.getElementById('main-header');
+
+            settingsPanel.classList.remove('active');
+            searchResults.classList.remove('active');
+
+            if(type === 'settings') {
+                settingsPanel.classList.add('active');
+            } else if (type === 'search') {
+                searchResults.classList.add('active');
+            }
+
+            expansionArea.classList.add('open');
+            header.classList.add('expanded');
+        }
+
+        function closeExpansion() {
+            const expansionArea = document.getElementById('header-expansion-area');
+            const header = document.getElementById('main-header');
+            expansionArea.classList.remove('open');
+            header.classList.remove('expanded');
+            setTimeout(() => {
+                document.getElementById('settings-panel').classList.remove('active');
+                document.getElementById('search-results').classList.remove('active');
+            }, 500);
+        }
+
+        function toggleSettings(e) {
+            if(e) e.stopPropagation();
+            const expansionArea = document.getElementById('header-expansion-area');
+            const isSettingsOpen = document.getElementById('settings-panel').classList.contains('active');
+            if (isSettingsOpen && expansionArea.classList.contains('open')) {
+                closeExpansion();
+            } else {
+                openExpansion('settings');
+            }
+        }
+
+        function runSearch(q) {
+            if(!q.trim()) { 
+                closeExpansion(); 
+                return; 
+            }
+            
+            const match = names.map((n, i) => ({ n, id: i+1 })).filter(x => x.n.includes(q) || x.id.toString().includes(q));
+            const res = document.getElementById('search-results');
+            
+            if(match.length) {
+                const total = match.length;
+                res.innerHTML = match.map((m, index) => {
+                    const isLastOdd = (total % 2 !== 0 && index === total - 1);
+                    return `
+                        <div class="result-item ${isLastOdd ? 'last-odd' : ''}" onclick="window.location.href='part-${m.id}.html'">
+                            <span class="text-[11px] font-bold">الجزء ${m.n}</span>
+                            <span class="opacity-20 text-[9px] font-black tracking-tighter">#${String(m.id).padStart(2, '0')}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                res.innerHTML = '<div class="col-span-2 p-10 text-center opacity-20 text-[10px] uppercase font-black tracking-widest">لا توجد نتائج مطابقة</div>';
+            }
+            
+            openExpansion('search');
+        }
+
+        function handleMouseMove(e) {
+            const x = (e.clientX / window.innerWidth) - 0.5;
+            const y = (e.clientY / window.innerHeight) - 0.5;
+            document.getElementById('blob1').style.transform = `translate(${x * 120}px, ${y * 120}px)`;
+            document.getElementById('blob2').style.transform = `translate(${x * -100}px, ${y * -100}px)`;
+            document.getElementById('blob3').style.transform = `translate(${x * 60}px, ${y * -60}px)`;
+        }
+
+        function showErrorPopup(e) {
+            e.preventDefault();
+            document.getElementById('copyright-popup').style.display = 'flex';
+        }
+
+        function hideErrorPopup() {
+            document.getElementById('copyright-popup').style.display = 'none';
+        }
+
+        function goToCurrentPart() {
+            window.location.href = `part-${currentPillNumber}.html`;
         }
 
         function scrollToSection(id) {
             const el = document.getElementById(id);
-            if (el) window.scrollTo({ top: el.offsetTop - 100, behavior: 'smooth' });
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+            closeExpansion();
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            AOS.init({ duration: 1000, once: true });
+        window.onload = () => {
+            applyTheme();
+            const inputs = document.querySelectorAll('input[type="range"]');
+            inputs[0].value = state.blur;
+            inputs[1].value = state.opacity * 100;
+            document.getElementById('bg-template').value = state.template;
+
+            setInterval(() => {
+                currentPillNumber = currentPillNumber >= 30 ? 1 : currentPillNumber + 1;
+                document.getElementById('part-pill').textContent = currentPillNumber;
+            }, 5000);
+
+            const grid = document.getElementById('grid-parts');
+            grid.innerHTML = names.map((n, i) => `
+                <div class="glass-core p-8 rounded-[40px] text-center group cursor-pointer hover:-translate-y-2 transition-all" data-aos="fade-up" onclick="window.location.href='part-${i+1}.html'">
+                    <div class="text-3xl font-black mb-3 opacity-20 group-hover:opacity-100 group-hover:text-amber-500 transition-all">${i+1}</div>
+                    <div class="text-[9px] font-black opacity-40">الجزء ${n}</div>
+                </div>
+            `).join('');
+            AOS.init({ once: true, duration: 800 });
+        };
+
+        window.addEventListener('scroll', () => {
+            document.getElementById('main-header').classList.toggle('header-scrolled', window.scrollY > 50);
+        });
+
+        document.addEventListener('click', (e) => {
+            if(!document.getElementById('main-header').contains(e.target)) {
+                closeExpansion();
+            }
         });
     </script>
+    <style>
+        .toggle-btn { width: 45px; height: 24px; background: rgba(120,120,120,0.3); border-radius: 50px; position: relative; transition: 0.3s; cursor: pointer; }
+        .toggle-btn::after { content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: 0.3s; }
+        .toggle-btn.on { background: #34c759; }
+        .toggle-btn.on::after { left: 24px; }
+        #save-toast { position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%); background: #34c759; color: white; padding: 12px 35px; border-radius: 100px; font-size: 11px; font-weight: 900; transition: 0.6s var(--spring-ease); opacity: 0; z-index: 999999; }
+    </style>
 </body>
 </html>
-
-
