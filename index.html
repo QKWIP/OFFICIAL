@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QKWIP - الإصدار النهائي</title>
+    <title>QKWIP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -183,8 +183,8 @@
             width: 100%;
         }
 
-        #part-pill { cursor: pointer; transition: all 0.5s var(--spring-ease); }
-        #part-pill:hover { transform: scale(1.1); background: var(--accent-gold); color: white; }
+        #pill { cursor: pointer; transition: all 0.5s var(--spring-ease); }
+        #pill:hover { transform: scale(1.1); background: var(--accent-gold); color: white; }
 
         .social-card {
             transition: 0.4s var(--spring-ease);
@@ -236,7 +236,7 @@
                 <span onclick="scrollToSection('contact')" class="nav-item">تواصل</span>
             </nav>
 
-            <div id="part-pill" onclick="goToCurrentPart()" class="px-5 py-1.5 bg-white text-black rounded-full font-black text-[12px] shadow-xl min-w-[45px] text-center">1</div>
+            <div id="pill" onclick="goToCurrentPart()" class="px-5 py-1.5 bg-white text-black rounded-full font-black text-[12px] shadow-xl min-w-[45px] text-center">1</div>
         </div>
 
         <div id="header-expansion-area" class="header-content-area">
@@ -457,7 +457,7 @@
                 res.innerHTML = match.map((m, index) => {
                     const isLastOdd = (total % 2 !== 0 && index === total - 1);
                     return `
-                        <div class="result-item ${isLastOdd ? 'last-odd' : ''}" onclick="window.location.href='part-${m.id}.html'">
+                        <div class="result-item ${isLastOdd ? 'last-odd' : ''}" onclick="window.location.href='${m.id}.html'">
                             <span class="text-[11px] font-bold">الجزء ${m.n}</span>
                             <span class="opacity-20 text-[9px] font-black tracking-tighter">#${String(m.id).padStart(2, '0')}</span>
                         </div>
@@ -538,3 +538,4 @@
     </style>
 </body>
 </html>
+
