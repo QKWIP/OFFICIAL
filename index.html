@@ -511,7 +511,7 @@
 
             const grid = document.getElementById('grid-parts');
             grid.innerHTML = names.map((n, i) => `
-                <div class="glass-core p-8 rounded-[40px] text-center group cursor-pointer hover:-translate-y-2 transition-all" data-aos="fade-up" onclick="window.location.href='part-${i+1}.html'">
+                <div class="glass-core p-8 rounded-[40px] text-center group cursor-pointer hover:-translate-y-2 transition-all" data-aos="fade-up" onclick="window.location.href='${i+1}.html'">
                     <div class="text-3xl font-black mb-3 opacity-20 group-hover:opacity-100 group-hover:text-amber-500 transition-all">${i+1}</div>
                     <div class="text-[9px] font-black opacity-40">الجزء ${n}</div>
                 </div>
@@ -538,4 +538,5 @@
     </style>
 </body>
 </html>
+
 
