@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مصحف الأنوار الرقمي</title>
+    <!-- Scripts: React, Tailwind, Framer Motion, Lucide Icons -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Kufi+Arabic:wght@400;700&family=Reem+Kufi:wght@400;700&display=swap');
+        
+        body { 
+            background: #02040a; 
+            margin: 0; 
+            color: white;
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .fixed-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -10;
+            background-image: url('https://images.unsplash.com/photo-1609599006353-e629aaabfeae?fm=jpg&q=60&w=3000');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transform: scale(1.1);
+        }
+
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -9;
+            background: radial-gradient(circle at center, rgba(2, 4, 10, 0.4), #02040a);
+            backdrop-filter: blur(2px);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .custom-scrollbar-reader::-webkit-scrollbar { width: 0px; }
+
+        .basmala-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .basmala-text {
+            font-family: 'Amiri Quran', serif;
+            font-size: 3.5rem;
+            color: #2dd4bf;
+            text-shadow: 0 0 15px rgba(45, 212, 191, 0.3);
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .separator-line {
+            height: 2px;
+            width: 300px;
+            background: linear-gradient(90deg, transparent, #2dd4bf, transparent);
+            opacity: 0.4;
+            position: relative;
+        }
+        
+        .separator-line::after {
+            content: '✦';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #2dd4bf;
+            background: #02040a;
+            padding: 0 10px;
+            font-size: 1rem;
+        }
+
+        .ayah-span {
+            display: inline-block;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            scroll-margin: 200px; /* المسافة المتروكة عند التمرير التلقائي */
+        }
+
+        .ayah-end {
+            font-family: serif;
+            font-size: 0.85rem;
+            opacity: 0.3;
+            margin-right: 8px;
+            color: #2dd4bf;
+            font-weight: bold;
+        }
+        
+        .active-ayah {
+            color: #2dd4bf !important;
+            text-shadow: 0 0 25px rgba(45, 212, 191, 0.8);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .basmala-text { font-size: 2.2rem; }
+            .separator-line { width: 180px; }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        
+        const MotionDiv = window.framerMotion?.motion?.div || "div";
+        const MotionSpan = window.framerMotion?.motion?.span || "span";
+        const AnimatePresence = window.framerMotion?.AnimatePresence || (({children}) => <>{children}</>);
+
+        const RECITERS = [
+            { id: 'ar.alafasy', name: 'مشاري العفاسي' },
+            { id: 'ar.minshawi', name: 'محمد صديق المنشاوي' },
+            { id: 'ar.husary', name: 'محمود خليل الحصري' },
+            { id: 'ar.abdulsamad', name: 'عبدالباسط عبدالصمد' },
+            { id: 'ar.islamsobhi', name: 'إسلام صبحي' }
+        ];
+
+        const FONTS = [
+            { id: 'font-quran', name: 'العثماني', family: "'Amiri Quran', serif" },
+            { id: 'font-kufi', name: 'الكوفي', family: "'Noto Kufi Arabic', sans-serif" }
+        ];
+
+        const Icon = ({ name, size = 20, className = "" }) => {
+            useEffect(() => {
+                if (window.lucide) window.lucide.createIcons();
+            }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+        };
+
+        const App = () => {
+            const [surahs, setSurahs] = useState([]);
+            const [selectedSurah, setSelectedSurah] = useState(null);
+            const [verses, setVerses] = useState([]);
+            const [searchQuery, setSearchQuery] = useState("");
+            const [showList, setShowList] = useState(true);
+            const [currentFont, setCurrentFont] = useState(FONTS[0]);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [currentReciter, setCurrentReciter] = useState(RECITERS[0]);
+            const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
+            
+            const audioRef = useRef(null);
+            const playPromiseRef = useRef(null);
+            const activeAyahRef = useRef(null); // مرجع للآية النشطة للتحكم في التمرير
+
+            // التمرير التلقائي عند تغيير الآية النشطة
+            useEffect(() => {
+                if (activeAyahRef.current) {
+                    activeAyahRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }, [currentAyahIndex]);
+
+            useEffect(() => {
+                audioRef.current = new Audio();
+                const handleEnded = () => {
+                    setCurrentAyahIndex((prev) => {
+                        const next = prev + 1;
+                        if (next < verses.length) {
+                            playAyah(next);
+                            return next;
+                        }
+                        setIsPlaying(false);
+                        return prev;
+                    });
+                };
+                audioRef.current.addEventListener('ended', handleEnded);
+                
+                fetch("https://api.alquran.cloud/v1/surah")
+                    .then(res => res.json())
+                    .then(data => setSurahs(data.data || []));
+
+                return () => {
+                    if (audioRef.current) {
+                        audioRef.current.pause();
+                        audioRef.current.removeEventListener('ended', handleEnded);
+                    }
+                };
+            }, [verses, currentReciter]);
+
+            const safePause = async () => {
+                if (playPromiseRef.current) {
+                    try { await playPromiseRef.current; audioRef.current.pause(); } 
+                    catch (e) {} finally { playPromiseRef.current = null; }
+                } else { audioRef.current.pause(); }
+            };
+
+            const fetchContent = async (number) => {
+                try {
+                    await safePause();
+                    const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}/quran-uthmani`);
+                    const data = await res.json();
+                    setSelectedSurah(data.data);
+                    setVerses(data.data.ayahs || []);
+                    setCurrentAyahIndex(0);
+                    setShowList(false);
+                    setIsPlaying(false);
+                } catch (err) { console.error(err); }
+            };
+
+            const playAyah = async (index) => {
+                if (!verses || !verses[index]) return;
+                try {
+                    await safePause();
+                    const res = await fetch(`https://api.alquran.cloud/v1/ayah/${verses[index].number}/${currentReciter.id}`);
+                    const data = await res.json();
+                    if (data.data && data.data.audio) {
+                        audioRef.current.src = data.data.audio;
+                        audioRef.current.load();
+                        playPromiseRef.current = audioRef.current.play();
+                        await playPromiseRef.current;
+                        setIsPlaying(true);
+                        setCurrentAyahIndex(index);
+                    }
+                } catch (err) { setIsPlaying(false); }
+            };
+
+            const filteredSurahs = surahs.filter(s => s.name.includes(searchQuery) || s.number.toString() === searchQuery);
+
+            return (
+                <div className="h-screen w-full flex flex-col items-center relative overflow-hidden">
+                    <div className="fixed-bg"></div>
+                    <div className="bg-overlay"></div>
+
+                    <main className="w-full max-w-6xl h-full flex flex-col z-10">
+                        <AnimatePresence mode="wait">
+                            {showList ? (
+                                <MotionDiv 
+                                    key="list"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    className="flex flex-col h-full p-4 md:p-8"
+                                >
+                                    <header className="mb-8">
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h1 className="text-4xl font-black text-teal-400">مُصحف الأنوار</h1>
+                                            <div className="flex gap-2">
+                                                {FONTS.map(f => (
+                                                    <button key={f.id} onClick={() => setCurrentFont(f)} className={`px-4 py-2 rounded-xl text-xs border transition-all ${currentFont.id === f.id ? 'bg-teal-500 border-teal-400 text-white' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'}`}>{f.name}</button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="relative">
+                                            <input 
+                                                type="text" 
+                                                placeholder="ابحث عن السورة..." 
+                                                className="w-full bg-black/40 p-6 rounded-3xl border border-white/10 outline-none text-center focus:ring-1 ring-teal-500/50 text-xl"
+                                                onChange={e => setSearchQuery(e.target.value)}
+                                            />
+                                        </div>
+                                    </header>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-y-auto custom-scrollbar pb-10">
+                                        {filteredSurahs.map((s, idx) => (
+                                            <MotionDiv 
+                                                key={s.number} 
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ delay: idx * 0.01 }}
+                                                onClick={() => fetchContent(s.number)} 
+                                                className="p-6 bg-white/[0.03] backdrop-blur-xl border border-white/5 rounded-[2rem] flex justify-between items-center cursor-pointer hover:bg-teal-500/10 transition-all group"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <span className="w-10 h-10 rounded-xl bg-black/40 flex items-center justify-center text-teal-400 font-bold border border-white/5">{s.number}</span>
+                                                    <span className="font-bold text-lg">{s.name}</span>
+                                                </div>
+                                                <Icon name="chevron-left" className="text-teal-400 opacity-40 group-hover:opacity-100" />
+                                            </MotionDiv>
+                                        ))}
+                                    </div>
+                                </MotionDiv>
+                            ) : (
+                                <MotionDiv 
+                                    key="reader"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="flex flex-col h-full"
+                                >
+                                    <header className="p-6 bg-black/60 backdrop-blur-3xl border-b border-white/10 flex justify-between items-center z-50">
+                                        <button onClick={() => setShowList(true)} className="p-3 bg-white/5 rounded-2xl hover:bg-white/10"><Icon name="arrow-right" /></button>
+                                        
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="flex items-center gap-6">
+                                                <button onClick={() => playAyah(currentAyahIndex - 1)} className="text-white/20 hover:text-white transition-all"><Icon name="skip-back" size={24} /></button>
+                                                <button onClick={() => isPlaying ? safePause().then(() => setIsPlaying(false)) : playAyah(currentAyahIndex)} className="w-14 h-14 bg-teal-500 rounded-full flex items-center justify-center shadow-lg shadow-teal-500/30 transition-transform active:scale-95">
+                                                    <Icon name={isPlaying ? "pause" : "play"} size={28} />
+                                                </button>
+                                                <button onClick={() => playAyah(currentAyahIndex + 1)} className="text-white/20 hover:text-white transition-all"><Icon name="skip-forward" size={24} /></button>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Icon name="mic" size={12} className="text-teal-400" />
+                                                <select 
+                                                    className="bg-transparent text-[10px] text-white/60 outline-none cursor-pointer font-bold"
+                                                    value={currentReciter.id}
+                                                    onChange={e => setCurrentReciter(RECITERS.find(r => r.id === e.target.value))}
+                                                >
+                                                    {RECITERS.map(r => <option key={r.id} value={r.id} className="bg-black text-white">{r.name}</option>)}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="text-left">
+                                            <h2 className="text-2xl font-black text-teal-400">{selectedSurah?.name}</h2>
+                                            <span className="text-[10px] opacity-40">آية {verses[currentAyahIndex]?.numberInSurah || 1}</span>
+                                        </div>
+                                    </header>
+
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar-reader py-12 px-6 scroll-smooth">
+                                        <div 
+                                            className="max-w-4xl mx-auto text-center"
+                                            style={{ fontFamily: currentFont.family }}
+                                        >
+                                            <div className="text-4xl md:text-6xl leading-[6rem] md:leading-[10rem]">
+                                                {verses.map((v, i) => {
+                                                    const isBasmala = v.text.includes("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ") && selectedSurah?.number !== 1;
+                                                    const cleanText = isBasmala ? v.text.replace("", "") : v.text;
+                                                    const isActive = currentAyahIndex === i;
+
+                                                    return (
+                                                        <React.Fragment key={v.number}>
+                                                            {isBasmala && (
+                                                                <MotionDiv 
+                                                                    initial={{ opacity: 0, y: -20 }}
+                                                                    animate={{ opacity: 1, y: 0 }}
+                                                                    className="basmala-container"
+                                                                >
+                                                                    <div className="basmala-text">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+                                                                    <div className="separator-line"></div>
+                                                                </MotionDiv>
+                                                            )}
+                                                            <MotionSpan 
+                                                                ref={isActive ? activeAyahRef : null}
+                                                                initial={{ opacity: 0 }}
+                                                                animate={{ opacity: 1 }}
+                                                                transition={{ delay: i * 0.005 }}
+                                                                onClick={() => playAyah(i)}
+                                                                className={`ayah-span px-2 cursor-pointer ${isActive ? 'active-ayah' : 'text-white/70 hover:text-white'}`}
+                                                            >
+                                                                {cleanText}
+                                                                <span className="ayah-end">({v.numberInSurah})</span>
+                                                            </MotionSpan>
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                        <div className="h-64"></div>
+                                    </div>
+                                </MotionDiv>
+                            )}
+                        </AnimatePresence>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
